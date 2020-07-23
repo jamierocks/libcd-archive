@@ -6,6 +6,10 @@ import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.impl.LootTableMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 import net.minecraft.class_173;
 import net.minecraft.class_2960;
 import net.minecraft.class_3300;
@@ -14,11 +18,6 @@ import net.minecraft.class_39;
 import net.minecraft.class_52;
 import net.minecraft.class_58;
 import net.minecraft.class_60;
-import net.minecraft.loot.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 
 public class LootTweaker implements Tweaker {
 	public static final LootTweaker INSTANCE = new LootTweaker();

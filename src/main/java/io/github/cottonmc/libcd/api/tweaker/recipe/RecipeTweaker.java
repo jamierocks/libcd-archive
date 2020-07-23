@@ -3,16 +3,15 @@ package io.github.cottonmc.libcd.api.tweaker.recipe;
 import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
-import com.google.common.collect.ImmutableMap;
+import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.CustomOutputRecipe;
 import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
+import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
-import io.github.cottonmc.libcd.api.util.NbtMatchType;
-import io.github.cottonmc.libcd.api.CDLogger;
 import net.minecraft.class_1792;
 import net.minecraft.class_1799;
 import net.minecraft.class_1802;
@@ -108,7 +107,7 @@ public class RecipeTweaker implements Tweaker {
 				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			for (class_2960 id : new HashSet<>(map.keySet())) {
-				class_1860 recipe = map.get(id);
+				class_1860<?> recipe = map.get(id);
 				boolean shouldRemove = false;
 				if (recipe instanceof CustomOutputRecipe) {
 					Collection<class_1792> items = ((CustomOutputRecipe)recipe).getOutputItems();
@@ -182,6 +181,8 @@ public class RecipeTweaker implements Tweaker {
 			if (!toRemove.containsKey(type)) toRemove.put(type, new ArrayList<>());
 			List<class_2960> removal = toRemove.get(type);
 			removal.add(formatted);
+		} else {
+			getLogger().error("Tried to remove recipe %s that doesn't exist", id);
 		}
 	}
 
@@ -255,8 +256,7 @@ public class RecipeTweaker implements Tweaker {
 	 * Make an Ingredient object to pass to recipes from a string of inputs.
 	 * @param nbtMatch The NBT matching type to use: "none", "fuzzy", or "exact".
 	 * @param inputs The string forms of inputs to add to the Ingredient.
-	 * @return An Ingredient object to pass to recipes.
-	 * @throws CDSyntaxError If an input is malformed.
+	 * @return An Ingredient object to pass to recipes, or an empty ingredient if there's a malformed input..
 	 */
 	public class_1856 makeIngredient(String nbtMatch, String...inputs) {
 		List<class_1799> stacks = new ArrayList<>();
@@ -267,6 +267,7 @@ public class RecipeTweaker implements Tweaker {
 				stacks.addAll(Arrays.asList(in));
 			} catch (CDSyntaxError e) {
 				logger.error("Could not add stack to ingredient: malformed stack string %s", input);
+				return class_1856.field_9017;
 			}
 		}
 		class_1856 ret = RecipeParser.hackStackIngredients(stacks.toArray(new class_1799[]{}));

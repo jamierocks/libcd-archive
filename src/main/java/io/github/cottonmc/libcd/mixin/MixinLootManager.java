@@ -13,18 +13,18 @@ import net.minecraft.class_60;
 
 @Mixin(class_60.class)
 public class MixinLootManager implements LootTableMapAccessor {
-	@Shadow private Map<class_2960, class_52> suppliers;
+	@Shadow private Map<class_2960, class_52> tables;
 
 	@Shadow @Final private class_4567 conditionManager;
 
 	@Override
 	public Map<class_2960, class_52> libcd$getLootTableMap() {
-		return suppliers;
+		return tables;
 	}
 
 	@Override
 	public void libcd$setLootTableMap(Map<class_2960, class_52> map) {
-		this.suppliers = map;
+		this.tables = map;
 	}
 
 	@Override

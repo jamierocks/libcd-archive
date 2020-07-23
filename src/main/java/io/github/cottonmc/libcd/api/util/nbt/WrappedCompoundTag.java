@@ -4,6 +4,8 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.class_2487;
 import net.minecraft.class_2499;
 import net.minecraft.class_2520;
+import net.minecraft.nbt.*;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -171,30 +173,31 @@ public class WrappedCompoundTag {
 	}
 
 	/**
-	 * Check if the tag has a UUID.
-	 * @param key The key to check at.
-	 * @return Whether the tag has a UUID with this key.
-	 */
-	public boolean hasUuid(String key) {
-		return underlying.method_10576(key);
-	}
-
-	/**
-	 * Get a UUID in the tag. Stored as two longs titled "<key>Most" and "<key>Least".
+	 * Reads a {@link UUID} from its NBT representation in this {@code CompoundTag}.
 	 * @param key The key to get from.
 	 * @return The value of the UUID tags with this key, or "00000000-0000-0000-0000-000000000000".
 	 */
-	public String getUuid(String key) {
-		return underlying.method_10584(key).toString();
+	public UUID getUuidNew(String key) {
+		return underlying.method_25926(key);
+	}
+
+	/**
+	 * Returns {@code true} if this {@code CompoundTag} contains a valid UUID representation associated with the given key.
+	 * A valid UUID is represented by an int array of length 4.
+	 * @param key The key to check at.
+	 * @return Whether the tag has a UUID with this key.
+	 */
+	public boolean containsUuidNew(String key) {
+		return underlying.method_25928(key);
 	}
 
 	/**
 	 * Insert a UUID into the tag. Saved as two longs titled "<key>Most" and "<key>Least".
 	 * @param key The key to insert at.
-	 * @param value The UUID to insert.
+	 * @param value The long to insert.
 	 */
-	public void putUuid(String key, String value) {
-		underlying.method_10560(key, UUID.fromString(value));
+	public void putUuidNew(String key, UUID value) {
+		underlying.method_25927(key, value);
 	}
 
 	/**

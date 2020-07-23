@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 group = 'io.github.cottonmc'
-version = '2.3.0+20w06a'
+version = '2.3.1+20w15a'
 
 repositories {
     mavenCentral()
@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    minecraft 'com.mojang:minecraft:20w06a'
+    minecraft 'com.mojang:minecraft:20w15a'
     modImplementation 'io.github.cottonmc:Jankson-Fabric:2.0.1+j1.2.0'
-    modImplementation 'net.fabricmc:fabric-loader:0.7.8+build.184'
-    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.4.30+build.294-1.16'
+    modImplementation 'net.fabricmc:fabric-loader:0.8.2+build.194'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.5.10+build.320-1.16'
 }
