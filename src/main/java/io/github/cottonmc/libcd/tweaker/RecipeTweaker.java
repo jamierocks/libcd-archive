@@ -90,7 +90,8 @@ public class RecipeTweaker implements Tweaker {
 		JsonArray added = new JsonArray();
 		JsonArray removed = new JsonArray();
 		for (class_3956<?> type : types) {
-			String typeId = class_2378.field_17597.method_10221(type).toString();
+			class_2960 preTypeId = class_2378.field_17597.method_10221(type);
+			String typeId = preTypeId == null? "unknown" : preTypeId.toString();
 			Map<class_2960, class_1860<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
 			//remove before we add, so that we don't accidentally remove our own recipes!
 			for (class_2960 recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
