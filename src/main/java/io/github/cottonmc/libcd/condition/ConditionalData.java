@@ -96,6 +96,12 @@ public class ConditionalData {
 						if (!testCondition(id, parseElement(obj.get(key)))) return false;
 					}
 				}
+			} else if (elem == null) {
+				LibCD.logger.error("Error parsing meta for {}: primary \"when\" key does not exist", resourceId);
+				return false;
+			} else {
+				LibCD.logger.error("Error parsing meta for {}: primary \"when\" key is not a JsonArray", resourceId);
+				return false;
 			}
 			return true;
 		} catch (SyntaxError e) {
@@ -105,7 +111,7 @@ public class ConditionalData {
 	}
 
 	@Nullable
-	private static Object parseElement(JsonElement element) {
+	public static Object parseElement(JsonElement element) {
 		if (element instanceof JsonPrimitive) {
 			return ((JsonPrimitive)element).getValue();
 		} else if (element instanceof JsonNull) {
