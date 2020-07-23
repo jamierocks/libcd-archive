@@ -1,19 +1,26 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.types.JsonOps;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
-import java.util.*;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_1792;
 import net.minecraft.class_1799;
 import net.minecraft.class_1802;
 import net.minecraft.class_1856;
 import net.minecraft.class_2371;
+import net.minecraft.class_2378;
+import net.minecraft.class_2509;
 import net.minecraft.class_2540;
 import net.minecraft.class_2960;
 import net.minecraft.class_3489;
 import net.minecraft.class_3494;
+import java.util.*;
 
 /**
  * Helper class to make public versions private recipe methods
@@ -299,17 +306,36 @@ public class RecipeParser {
 	/**
 	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
 	 * so I have to write this ugly, terrible hack to make it work!
-	 * Serializes the input stacks into a PacketByteBuf,
+	 * Serializes the input stacks into a PacketByteBuf (or JSON if NBT Crafting is here to deal with NBT),
 	 * then tricks the Ingredient class into deserializing them.
 	 * @param stacks The input stacks to support.
 	 * @return The ingredient object for the input stacks.
 	 */
 	public static class_1856 hackStackIngredients(class_1799...stacks) {
-		class_2540 buf = new class_2540(Unpooled.buffer());
-		buf.method_10804(stacks.length);
-		for (class_1799 stack : stacks) {
-			buf.method_10793(stack);
+		if (FabricLoader.getInstance().isModLoaded("nbtcrafting")) {
+			JsonArray array = new JsonArray();
+			for (class_1799 stack : stacks) {
+				array.add(serializeStack(stack));
+			}
+			return class_1856.method_8102(array);
+		} else {
+			class_2540 buf = new class_2540(Unpooled.buffer());
+			buf.method_10804(stacks.length);
+			for (class_1799 stack : stacks) {
+				buf.method_10793(stack);
+			}
+			return class_1856.method_8086(buf);
 		}
-		return class_1856.method_8086(buf);
+	}
+
+	private static JsonObject serializeStack(class_1799 stack) {
+		JsonObject ret = new JsonObject();
+		ret.addProperty("item", class_2378.field_11142.method_10221(stack.method_7909()).toString());
+		ret.addProperty("count", stack.method_7947());
+		if (stack.method_7985()) {
+			JsonObject data = Dynamic.convert(class_2509.field_11560, JsonOps.INSTANCE, stack.method_7969()).getAsJsonObject();
+			ret.add("data", data);
+		}
+		return ret;
 	}
 }

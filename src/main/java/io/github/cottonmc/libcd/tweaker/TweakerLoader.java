@@ -13,6 +13,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -29,7 +30,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 			for (class_2960 fileId : resources) {
 				try {
 					class_3298 res = manager.method_14486(fileId);
-					String script = IOUtils.toString(res.method_14482());
+					String script = IOUtils.toString(res.method_14482(), StandardCharsets.UTF_8);
 					int localPath = fileId.method_12832().indexOf('/')+1;
 					class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring(localPath));
 					TWEAKERS.put(scriptId, script);
@@ -43,7 +44,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				for (class_2960 fileId : setResources) {
 					try {
 						class_3298 res = manager.method_14486(fileId);
-						String script = IOUtils.toString(res.method_14482());
+						String script = IOUtils.toString(res.method_14482(), StandardCharsets.UTF_8);
 						TWEAKERS.put(fileId, script);
 					} catch (IOException e) {
 						LibCD.logger.error("Error when accessing tweaker script %s in subset %s: %s", fileId.toString(), subset, e.getMessage());
