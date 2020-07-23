@@ -2,6 +2,15 @@ package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
+import io.github.cottonmc.libcd.impl.ResourceSearcher;
+import net.minecraft.class_2960;
+import net.minecraft.class_3294;
+import net.minecraft.class_3296;
+import net.minecraft.class_3298;
+import net.minecraft.class_3300;
+import net.minecraft.class_3302;
+import net.minecraft.class_3304;
+import net.minecraft.resource.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -12,23 +21,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import net.minecraft.class_2960;
-import net.minecraft.class_3296;
-import net.minecraft.class_3298;
-import net.minecraft.class_3302;
-import net.minecraft.class_3304;
 
 @Mixin(class_3304.class)
-public abstract class MixinResourceManagerImpl implements class_3296, ReloadListenersAccessor {
+public abstract class MixinResourceManagerImpl implements class_3296, ReloadListenersAccessor, ResourceSearcher {
 
 	@Shadow @Final private static Logger LOGGER;
 
 	@Shadow @Final private List<class_3302> listeners;
+
+	@Shadow public abstract List<class_3298> method_14489(class_2960 identifier_1) throws IOException;
+
+	@Shadow @Final private Map<String, class_3294> namespaceManagers;
 
 	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable cir,
@@ -38,7 +48,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 			//don't try to load for things that use mcmetas already!
 			if (id.method_12832().contains(".mcmeta") || id.method_12832().contains(".png")) continue;
 			class_2960 metaId = new class_2960(id.method_12836(), id.method_12832() + ".mcmeta");
-			if (method_18234(metaId)) {
+			if (libcd_contains(metaId)) {
 				try {
 					class_3298 meta = method_14486(metaId);
 					String metaText = IOUtils.toString(meta.method_14482());
@@ -56,4 +66,11 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 	public List<class_3302> libcd_getListeners() {
 		return listeners;
 	}
+
+	public boolean libcd_contains(class_2960 id) {
+		class_3300 manager = this.namespaceManagers.get(id.method_12836());
+		return manager != null && ((ResourceSearcher) manager).libcd_contains(id);
+	}
+
+
 }

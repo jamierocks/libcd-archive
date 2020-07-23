@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
 import io.github.cottonmc.libcd.LibCD;
+import io.netty.buffer.Unpooled;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import net.minecraft.class_1799;
 import net.minecraft.class_1802;
 import net.minecraft.class_1856;
 import net.minecraft.class_2371;
+import net.minecraft.class_2540;
 import net.minecraft.class_2960;
 import net.minecraft.class_3489;
 import net.minecraft.class_3494;
@@ -34,11 +36,11 @@ public class RecipeParser {
 			LibCD.logger.warn("Use of deprecated potion-getting method in '" + input + "', this will be removed soon!");
 			class_1799 stack = TweakerUtils.getPotion(input.substring(1));
 			if (stack.method_7960()) throw new TweakerSyntaxException("Failed to get potion for input: " + input);
-			return class_1856.method_8101(stack);
+			return hackStackIngredients(stack);
 		} else if (input.contains("->")) {
 			class_1799 stack = TweakerUtils.getSpecialStack(input);
 			if (stack.method_7960()) throw new TweakerSyntaxException("Failed to get special stack for input: " + input);
-			return class_1856.method_8101(stack);
+			return hackStackIngredients(stack);
 		} else {
 			class_1792 item = TweakerUtils.getItem(input);
 			if (item == class_1802.field_8162) throw new TweakerSyntaxException("Failed to get item for input: " + input);
@@ -212,5 +214,22 @@ public class RecipeParser {
 		int i;
 		for (i = input.length() - 1; i >= 0 && input.charAt(i) == ' '; i--) { }
 		return i;
+	}
+
+	/**
+	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
+	 * so I have to write this ugly, terrible hack to make it work!
+	 * Serializes the input stacks into a PacketByteBuf,
+	 * then tricks the Ingredient class into deserializing them.
+	 * @param stacks The input stacks to support.
+	 * @return The ingredient object for the input stacks.
+	 */
+	public static class_1856 hackStackIngredients(class_1799...stacks) {
+		class_2540 buf = new class_2540(Unpooled.buffer());
+		buf.writeInt(stacks.length);
+		for (int i = 0; i < stacks.length; i++) {
+			buf.method_10793(stacks[i]);
+		}
+		return class_1856.method_8086(buf);
 	}
 }
