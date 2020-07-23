@@ -31,9 +31,7 @@ public class ConditionalData {
 					for (String key : obj.keySet()) {
 						class_2960 id = key.equals("or")? new class_2960(CDCommons.MODID, "or") : new class_2960(key);
 						try {
-							boolean test = testCondition(id, parseElement(obj.get(key)));
-							CDCommons.logger.info("Tested condition " + key + " in " + resourceId + ", returned " + test);
-							if (!test) return false;
+							if (!testCondition(id, parseElement(obj.get(key)))) return false;
 						} catch (CDSyntaxError e) {
 							CDCommons.logger.error("Error parsing meta for %s: %s", resourceId, e.getMessage());
 						}
