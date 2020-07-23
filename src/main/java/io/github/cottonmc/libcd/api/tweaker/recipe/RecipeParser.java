@@ -5,9 +5,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
+import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
+import io.github.cottonmc.libcd.api.util.MutableStack;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,17 +37,24 @@ public class RecipeParser {
 	 * @return the Ingredient for the given id
 	 */
 	public static class_1856 processIngredient(Object input) throws CDSyntaxError {
-		if (input instanceof class_1856) return (class_1856)input;
-		else if (input instanceof class_1799) {
-			class_1799 stack = (class_1799)input;
+		if (input instanceof class_1856) return (class_1856) input;
+		else if (input instanceof MutableStack) {
+			class_1799 stack = ((MutableStack) input).get();
 			class_1856 ing = hackStackIngredients(stack);
 			if (stack.method_7985()) {
-				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
 			}
 			return ing;
 		}
-		else if (input instanceof class_1799[]) {
-			class_1799[] stacks = (class_1799[])input;
+		else if (input instanceof class_1799) {
+			class_1799 stack = (class_1799) input;
+			class_1856 ing = hackStackIngredients(stack);
+			if (stack.method_7985()) {
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
+			}
+			return ing;
+		} else if (input instanceof class_1799[]) {
+			class_1799[] stacks = (class_1799[]) input;
 			boolean needsTags = false;
 			for (int i = 0; i < stacks.length; i++) {
 				class_1799 stack = stacks[i];
@@ -55,12 +64,11 @@ public class RecipeParser {
 			}
 			class_1856 ing = hackStackIngredients(stacks);
 			if (needsTags) {
-				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
 			}
 			return ing;
-		}
-		else if (input instanceof String) {
-			String in = (String)input;
+		} else if (input instanceof String) {
+			String in = (String) input;
 			int index = in.indexOf('{');
 			String nbt = "";
 			NbtMatchType type = NbtMatchType.NONE;
@@ -105,35 +113,50 @@ public class RecipeParser {
 	}
 
 	public static class_1799 processItemStack(Object input) throws CDSyntaxError {
-		if (input instanceof class_1799) return (class_1799)input;
+		if (input instanceof class_1799) return (class_1799) input;
+		else if (input instanceof MutableStack) return ((MutableStack) input).get();
 		else if (input instanceof String) {
-			String in = (String)input;
+			String in = (String) input;
 			int atIndex = in.lastIndexOf('@');
+			int nbtIndex = in.indexOf('{');
 			int count = 1;
 			if (atIndex != -1 && atIndex > in.lastIndexOf('}')) {
 				count = Integer.parseInt(in.substring(atIndex + 1));
 				in = in.substring(0, atIndex);
 			}
-			if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
+			class_1792 item;
+			String nbt = "";
+			if (in.indexOf('#') == 0) {
+				if (nbtIndex != -1) {
+					nbt = in.substring(nbtIndex);
+					in = in.substring(0, nbtIndex);
+				}
+				String tag = in.substring(1);
+				class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
+				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
+				item = TagHelper.ITEM.getDefaultEntry(itemTag);
+			} else if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
 				class_1799 stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.method_7960())
-					throw new CDSyntaxError("Failed to get special stack for input: " + in);
+					throw new CDSyntaxError("Failed to get special stack for output: " + in);
 				if (stack.method_7946()) {
 					stack.method_7939(count);
 				}
 				return stack;
 			} else {
-				int nbtIndex = in.indexOf('{');
 				if (nbtIndex != -1) {
-					String nbt = in.substring(nbtIndex);
+					nbt = in.substring(nbtIndex);
 					in = in.substring(0, nbtIndex);
-					class_1799 stack = new class_1799(TweakerUtils.INSTANCE.getItem(in), count);
-					TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
-					return stack;
-				} else {
-					return new class_1799(TweakerUtils.INSTANCE.getItem(in), count);
 				}
+				item = TweakerUtils.INSTANCE.getItem(in);
 			}
+
+			class_1799 stack = new class_1799(item, count);
+			if (!nbt.equals("")) {
+				TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
+			}
+
+			return stack;
 		}
 		else throw new CDSyntaxError("Illegal object passed to recipe parser of type " + input.getClass().getName());
 	}

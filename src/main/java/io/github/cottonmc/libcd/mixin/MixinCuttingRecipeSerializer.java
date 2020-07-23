@@ -20,29 +20,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(class_3972.class_3973.class)
-public class MixinCuttingRecipeSerializer {
-	private MixinCuttingRecipeFactory invoker;
+public class MixinCuttingRecipeSerializer<T extends class_3972> {
 
-	//TODO: we need ATs...
-	@Inject(method = "<init>", at = @At("RETURN"))
-	private void saveInvoker(@Coerce Object invoker, CallbackInfo info) {
-		this.invoker = (MixinCuttingRecipeFactory) invoker;
-	}
+	@Shadow @Final private class_3972.class_3973.class_3974<T> recipeFactory;
 
 	@Inject(method = "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
 			cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void read(class_2960 id, JsonObject json, CallbackInfoReturnable info,
+	private void read(class_2960 id, JsonObject json, CallbackInfoReturnable<T> info,
 					  String group, class_1856 ingredient) {
 		JsonElement elem = json.get("result");
 		if (elem instanceof JsonObject) {
 			class_1799 stack = class_1869.method_8155((JsonObject)elem);
-			info.setReturnValue(invoker.invokeCreate(id, group, ingredient, stack));
+			info.setReturnValue(this.recipeFactory.create(id, group, ingredient, stack));
 		}
-	}
-
-	@Mixin(targets = "net.minecraft.recipe.CuttingRecipe$Serializer$RecipeFactory")
-	public interface MixinCuttingRecipeFactory<T extends class_3972> {
-		@Invoker
-		T invokeCreate(class_2960 id, String group, class_1856 ingredient, class_1799 stack);
 	}
 }

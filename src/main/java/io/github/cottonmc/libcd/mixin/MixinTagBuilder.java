@@ -6,6 +6,7 @@ import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.JanksonOps;
 import io.github.cottonmc.libcd.impl.TagBuilderWarningAccessor;
 import io.github.cottonmc.libcd.loader.TagExtensions;
+import io.github.cottonmc.libcd.tag.ItemTagHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import net.minecraft.class_1792;
+import net.minecraft.class_2960;
 import net.minecraft.class_3494;
 import net.minecraft.class_3518;
 
@@ -26,8 +31,10 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     @Unique
     private final List<Object> libcdWarnings = new ArrayList<>();
 
+    private class_2960 defaultEntry;
+
     @Inject(method = "read", at = @At(value = "RETURN", remap = false))
-    private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<class_3494.class_3495> cir) {
+    private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<class_3494.class_3495> info) {
         try {
             if (json.has("libcd")) {
                 TagExtensions.ExtensionResult result = TagExtensions.load(
@@ -41,10 +48,11 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
                 }
 
                 result.getEntries().forEach((entry) -> {
-                    this.entries.add(class_5145Accessor.createClass_5145(entry, string));
+                    this.entries.add(TagEntryAccessor.createTrackedEntry(entry, string));
                 });
 
                 libcdWarnings.addAll(result.getWarnings());
+                defaultEntry = result.getDefaultEntry();
             }
         } catch (Exception e) {
             libcdWarnings.add(e);
@@ -52,7 +60,20 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     }
 
     @Override
-    public List<Object> getWarnings() {
+    public List<Object> libcd$getWarnings() {
         return libcdWarnings;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Inject(method = "build", at = @At("RETURN"))
+    private <T> void injectDefaultEntry(Function<class_2960, class_3494<T>> tagGetter, Function<class_2960, T> objectGetter, CallbackInfoReturnable<Optional<class_3494<T>>> info) {
+        Optional<class_3494<T>> opt = info.getReturnValue();
+        if (opt.isPresent()) {
+            class_3494<T> tag = opt.get();
+            T t = objectGetter.apply(defaultEntry);
+            if (t instanceof class_1792) {
+                ItemTagHelper.INSTANCE.add((class_3494<class_1792>) tag, (class_1792) t);
+            }
+        }
     }
 }

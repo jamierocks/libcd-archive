@@ -11,22 +11,32 @@ import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
+import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
+import io.github.cottonmc.libcd.api.init.ConditionInitializer;
+import io.github.cottonmc.libcd.api.init.TweakerInitializer;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
+import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_2168;
 import net.minecraft.class_2170;
+import net.minecraft.class_2378;
 import net.minecraft.class_2588;
+import net.minecraft.class_2960;
 import net.minecraft.class_3264;
 import java.io.File;
 import java.io.FileOutputStream;
 
 public class LibCD implements ModInitializer {
+	public static final String MODID = "libcd";
 
 	public static CDConfig config;
 
@@ -37,17 +47,22 @@ public class LibCD implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = loadConfig();
-		FabricLoader.getInstance().getEntrypoints("libcd", LibCDInitializer.class).forEach(init -> {
+		FabricLoader.getInstance().getEntrypoints(MODID + ":tweakers", TweakerInitializer.class).forEach(init -> init.initTweakers(TweakerManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + ":conditions", ConditionInitializer.class).forEach(init -> init.initConditions(ConditionManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + ":advancement_rewards", AdvancementInitializer.class).forEach(init -> init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID, LibCDInitializer.class).forEach(init -> {
 			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
 			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
 		ResourceManagerHelper.get(class_3264.field_14190).registerReloadListener(new TweakerLoader());
-		CommandRegistry.INSTANCE.register(false, dispatcher -> {
+		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
+		class_2378.method_10230(class_2378.field_17598, new class_2960(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			
 			//New nodes
 			LiteralCommandNode<class_2168> libcdNode = class_2170
-					.method_9247("libcd")
+					.method_9247(MODID)
 					.build();
 
 			LiteralCommandNode<class_2168> subsetNode = class_2170
@@ -99,7 +114,7 @@ public class LibCD implements ModInitializer {
 		return 1;
 	}
 
-	public CDConfig loadConfig() {
+	public static CDConfig loadConfig() {
 		try {
 			Jankson jankson = CDCommons.newJankson();
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
@@ -120,7 +135,7 @@ public class LibCD implements ModInitializer {
 		return new CDConfig();
 	}
 
-	public void saveConfig(CDConfig config) {
+	public static void saveConfig(CDConfig config) {
 		try {
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
 			JsonElement json = CDCommons.newJankson().toJson(config);

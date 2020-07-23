@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "libcd",
-  "version": "2.3.1+20w15a",
+  "version": "2.4.0+20w20b",
 
   "name": "LibCapableData",
   "icon": "assets/libcd/icon.png",
@@ -17,11 +17,15 @@
     ],
     "libcd": [
       "io.github.cottonmc.libcd.CDContent"
+    ],
+    "libcd:advancement_rewards": [
+      "io.github.cottonmc.libcd.DevAdvancementRewards"
     ]
   },
   "mixins": [
     "mixins.libcd.json"
   ],
+  "accessWidener": "libcd.aw",
   "depends": {
     "fabricloader": ">=0.4.0"
   },

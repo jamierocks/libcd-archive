@@ -3,6 +3,7 @@ package io.github.cottonmc.libcd.api.tweaker.util;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.CDCommons;
+import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.tweaker.TweakerStackFactory;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeParser;
@@ -11,6 +12,7 @@ import io.github.cottonmc.libcd.api.util.nbt.WrappedCompoundTag;
 import net.minecraft.class_1299;
 import net.minecraft.class_1792;
 import net.minecraft.class_1799;
+import net.minecraft.class_1802;
 import net.minecraft.class_1887;
 import net.minecraft.class_2248;
 import net.minecraft.class_2371;
@@ -41,6 +43,18 @@ public class TweakerUtils {
 	 */
 	public class_1792 getItem(String id) {
 		return class_2378.field_11142.method_10223(new class_2960(id));
+	}
+
+	/**
+	 * Get the default item from an item tag.
+	 * @param id The ID of the tag to get from.
+	 * @return The default item for that tag.
+	 */
+	public class_1792 getDefaultItem(String id) {
+		class_2960 tagId = new class_2960(id);
+		class_3494<class_1792> tag = class_3489.method_15106().method_15193(tagId);
+		if (tag == null) return class_1802.field_8162;
+		return TagHelper.ITEM.getDefaultEntry(tag);
 	}
 
 	/**

@@ -7,12 +7,8 @@
     "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
       "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
     },
-    "io/github/cottonmc/libcd/mixin/MixinCookingRecipeSerializer$MixinCookingRecipeFactory": {
-      "net.minecraft.recipe.CookingRecipeSerializer$RecipeFactory": "net/minecraft/class_3957$class_3958",
-      "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;FI)Lnet/minecraft/class_1874;"
-    },
     "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
-      "deserialize": "Lnet/minecraft/class_170$class_172;method_754(Lcom/google/gson/JsonElement;Ljava/lang/reflect/Type;Lcom/google/gson/JsonDeserializationContext;)Lnet/minecraft/class_170;"
+      "fromJson": "Lnet/minecraft/class_170;method_27912(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_170;"
     },
     "io/github/cottonmc/libcd/mixin/MixinIngredient": {
       "test": "Lnet/minecraft/class_1856;method_8093(Lnet/minecraft/class_1799;)Z"
@@ -21,23 +17,23 @@
       "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;": "Lnet/minecraft/class_3518;method_15265(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;",
       "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;": "Lnet/minecraft/class_3972$class_3973;method_17881(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_3972;"
     },
-    "io/github/cottonmc/libcd/mixin/class_5145Accessor": {
+    "io/github/cottonmc/libcd/mixin/TagEntryAccessor": {
       "\u003cinit\u003e": "\u003cinit\u003e"
     },
     "io/github/cottonmc/libcd/mixin/MixinAdvancementRewards": {
       "toJson": "Lnet/minecraft/class_170;method_747()Lcom/google/gson/JsonElement;",
       "apply": "Lnet/minecraft/class_170;method_748(Lnet/minecraft/class_3222;)V"
     },
+    "io/github/cottonmc/libcd/mixin/MixinShapedRecipe": {
+      "getItemStack": "Lnet/minecraft/class_1869;method_8155(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_1799;"
+    },
     "io/github/cottonmc/libcd/mixin/MixinTagContainer": {
       "Lnet/minecraft/tag/Tag$Builder;build(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;": "Lnet/minecraft/class_3494$class_3495;method_26782(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;",
       "applyReload": "Lnet/minecraft/class_3503;method_18242(Ljava/util/Map;)V"
     },
-    "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer$MixinCuttingRecipeFactory": {
-      "net.minecraft.recipe.CuttingRecipe$Serializer$RecipeFactory": "net/minecraft/class_3972$class_3973$class_3974",
-      "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;)Lnet/minecraft/class_3972;"
-    },
     "io/github/cottonmc/libcd/mixin/MixinTagBuilder": {
-      "read": "Lnet/minecraft/class_3494$class_3495;method_26780(Lcom/google/gson/JsonObject;Ljava/lang/String;)Lnet/minecraft/class_3494$class_3495;"
+      "read": "Lnet/minecraft/class_3494$class_3495;method_26780(Lcom/google/gson/JsonObject;Ljava/lang/String;)Lnet/minecraft/class_3494$class_3495;",
+      "build": "Lnet/minecraft/class_3494$class_3495;method_26782(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;"
     }
   },
   "data": {
@@ -49,12 +45,8 @@
       "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
         "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
       },
-      "io/github/cottonmc/libcd/mixin/MixinCookingRecipeSerializer$MixinCookingRecipeFactory": {
-        "net.minecraft.recipe.CookingRecipeSerializer$RecipeFactory": "net/minecraft/class_3957$class_3958",
-        "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;FI)Lnet/minecraft/class_1874;"
-      },
       "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
-        "deserialize": "Lnet/minecraft/class_170$class_172;method_754(Lcom/google/gson/JsonElement;Ljava/lang/reflect/Type;Lcom/google/gson/JsonDeserializationContext;)Lnet/minecraft/class_170;"
+        "fromJson": "Lnet/minecraft/class_170;method_27912(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_170;"
       },
       "io/github/cottonmc/libcd/mixin/MixinIngredient": {
         "test": "Lnet/minecraft/class_1856;method_8093(Lnet/minecraft/class_1799;)Z"
@@ -63,23 +55,23 @@
         "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;": "Lnet/minecraft/class_3518;method_15265(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;",
         "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;": "Lnet/minecraft/class_3972$class_3973;method_17881(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_3972;"
       },
-      "io/github/cottonmc/libcd/mixin/class_5145Accessor": {
+      "io/github/cottonmc/libcd/mixin/TagEntryAccessor": {
         "\u003cinit\u003e": "\u003cinit\u003e"
       },
       "io/github/cottonmc/libcd/mixin/MixinAdvancementRewards": {
         "toJson": "Lnet/minecraft/class_170;method_747()Lcom/google/gson/JsonElement;",
         "apply": "Lnet/minecraft/class_170;method_748(Lnet/minecraft/class_3222;)V"
       },
+      "io/github/cottonmc/libcd/mixin/MixinShapedRecipe": {
+        "getItemStack": "Lnet/minecraft/class_1869;method_8155(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_1799;"
+      },
       "io/github/cottonmc/libcd/mixin/MixinTagContainer": {
         "Lnet/minecraft/tag/Tag$Builder;build(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;": "Lnet/minecraft/class_3494$class_3495;method_26782(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;",
         "applyReload": "Lnet/minecraft/class_3503;method_18242(Ljava/util/Map;)V"
       },
-      "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer$MixinCuttingRecipeFactory": {
-        "net.minecraft.recipe.CuttingRecipe$Serializer$RecipeFactory": "net/minecraft/class_3972$class_3973$class_3974",
-        "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;)Lnet/minecraft/class_3972;"
-      },
       "io/github/cottonmc/libcd/mixin/MixinTagBuilder": {
-        "read": "Lnet/minecraft/class_3494$class_3495;method_26780(Lcom/google/gson/JsonObject;Ljava/lang/String;)Lnet/minecraft/class_3494$class_3495;"
+        "read": "Lnet/minecraft/class_3494$class_3495;method_26780(Lcom/google/gson/JsonObject;Ljava/lang/String;)Lnet/minecraft/class_3494$class_3495;",
+        "build": "Lnet/minecraft/class_3494$class_3495;method_26782(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/util/Optional;"
       }
     }
   }

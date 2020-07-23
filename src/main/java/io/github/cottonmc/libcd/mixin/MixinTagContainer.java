@@ -31,7 +31,7 @@ public class MixinTagContainer {
             Iterator iterator,
             Map.Entry<class_2960, class_3494.class_3495> entry
             ) {
-        List<Object> warnings = ((TagBuilderWarningAccessor) entry.getValue()).getWarnings();
+        List<Object> warnings = ((TagBuilderWarningAccessor) entry.getValue()).libcd$getWarnings();
         if(!warnings.isEmpty()) {
             CDCommons.logger.warn("Found problems in tag extensions of tag " + entry.getKey() + ':');
             for (Object warning : warnings) {

@@ -85,7 +85,9 @@ public class CDContent implements LibCDInitializer {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
-						if (!class_3489.method_15106().method_15189().contains(new class_2960((String)obj))) return false;
+						class_2960 id = new class_2960((String) obj);
+						if (!class_3489.method_15106().method_15189().contains(id)) return false;
+						if (class_3489.method_15106().method_15193(id).method_15138().isEmpty()) return false;
 					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -113,7 +115,9 @@ public class CDContent implements LibCDInitializer {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
-						if (!class_3481.method_15073().method_15189().contains(new class_2960((String)obj))) return false;
+						class_2960 id = new class_2960((String) obj);
+						if (!class_3481.method_15073().method_15189().contains(id)) return false;
+						if (class_3489.method_15106().method_15193(id).method_15138().isEmpty()) return false;
 					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -189,20 +193,6 @@ public class CDContent implements LibCDInitializer {
 
 	@Override
 	public void initAdvancementRewards(AdvancementRewardsManager manager) {
-		if (LibCD.isDevMode()) {
-			manager.register(
-					new class_2960("libcd:without_settings"),
-					(serverPlayerEntity) -> CDCommons.logger.info(
-							"%s earned libcd:without_settings",
-							serverPlayerEntity.method_5476())
-			);
-			manager.register(
-					new class_2960("libcd:with_settings"),
-					(serverPlayerEntity, settings) -> CDCommons.logger.info(
-							"%s earned libcd:with_settings{setting1: %s}",
-							serverPlayerEntity.method_5476(),
-							settings.get("setting1").getAsNumber())
-			);
-		}
+		//no-op
 	}
 }

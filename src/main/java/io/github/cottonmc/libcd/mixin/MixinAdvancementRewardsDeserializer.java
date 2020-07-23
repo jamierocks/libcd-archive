@@ -20,11 +20,11 @@ import net.minecraft.class_2960;
 import net.minecraft.class_3222;
 import net.minecraft.class_3518;
 
-@Mixin(class_170.class_172.class)
+@Mixin(class_170.class)
 public class MixinAdvancementRewardsDeserializer {
-    @Inject(method = "deserialize", at = @At("TAIL"), cancellable = true)
-    public void onDeserialize(
-            JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext,
+    @Inject(method = "fromJson", at = @At("TAIL"), cancellable = true)
+    private static void onDeserialize(
+            JsonObject json,
             CallbackInfoReturnable<class_170> cir
     ) {
         CustomRewardsUtils value = (CustomRewardsUtils) cir.getReturnValue();
@@ -33,7 +33,7 @@ public class MixinAdvancementRewardsDeserializer {
         Map<class_2960, JsonObject> settings = Maps.newHashMap();
 
         class_3518.method_15292(
-                class_3518.method_15295(jsonElement, "rewards"),
+                class_3518.method_15295(json, "rewards"),
                 "libcd:custom",
                 new JsonArray()
         ).forEach(element -> {

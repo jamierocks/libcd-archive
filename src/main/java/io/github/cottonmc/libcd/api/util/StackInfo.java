@@ -15,7 +15,7 @@ import net.minecraft.class_2960;
  * A class with read-only info about a stack, accessible outside of obf. The stack and its NBT cannot be modified from a StackInfo.
  */
 public class StackInfo {
-	private class_1799 stack;
+	protected class_1799 stack;
 	public StackInfo(class_1799 stack) {
 		this.stack = stack.method_7972();
 	}
@@ -77,7 +77,8 @@ public class StackInfo {
 	}
 
 	/**
-	 * @return a non-modifiable view of the object's NBT, wrapped for usability.
+	 * NOTE: This is modifiable in {@link MutableStack}, but not in StackInfo.
+	 * @return a view of the object's NBT, wrapped for usability.
 	 */
 	public WrappedCompoundTag getTag() {
 		return new WrappedCompoundTag(stack.method_7948());
