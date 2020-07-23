@@ -1,12 +1,17 @@
 package io.github.cottonmc.libcd.tweaker;
 
+import blue.endless.jankson.JsonArray;
+import blue.endless.jankson.JsonObject;
+import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.github.cottonmc.libcd.util.TweakerLogger;
+import net.minecraft.class_1792;
 import net.minecraft.class_1799;
+import net.minecraft.class_1802;
 import net.minecraft.class_1856;
 import net.minecraft.class_1860;
 import net.minecraft.class_1863;
@@ -35,9 +40,11 @@ public class RecipeTweaker implements Tweaker {
 	private int removeCount;
 	private Map<class_3956<?>, List<class_1860<?>>> toAdd = new HashMap<>();
 	private Map<class_3956<?>, List<class_2960>> toRemove = new HashMap<>();
+	private Map<class_3956<?>, List<class_1792>> removeFor = new HashMap<>();
 	private String currentNamespace = "libcd";
 	private boolean canAddRecipes = false;
 	private TweakerLogger logger;
+	private JsonObject recipeDebug;
 
 	/**
 	 * Used during data pack loading to set up recipe adding.
@@ -45,11 +52,13 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void prepareReload(class_3300 manager) {
+		recipeDebug = new JsonObject();
 		triedRecipeCount = -1;
 		recipeCount = 0;
 		removeCount = 0;
 		toAdd.clear();
 		toRemove.clear();
+		removeFor.clear();
 		if (manager instanceof ReloadListenersAccessor) {
 			List<class_3302> listeners = ((ReloadListenersAccessor)manager).libcd_getListeners();
 			for (class_3302 listener : listeners) {
@@ -78,8 +87,27 @@ public class RecipeTweaker implements Tweaker {
 		Map<class_3956<?>, Map<class_2960, class_1860<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)recipeManager).libcd_getRecipeMap());
 		Set<class_3956<?>> types = new HashSet<>(recipeMap.keySet());
 		types.addAll(toAdd.keySet());
+		JsonArray added = new JsonArray();
+		JsonArray removed = new JsonArray();
 		for (class_3956<?> type : types) {
+			String typeId = class_2378.field_17597.method_10221(type).toString();
 			Map<class_2960, class_1860<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
+			//remove before we add, so that we don't accidentally remove our own recipes!
+			for (class_2960 recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
+				if (map.containsKey(recipeId)) {
+					map.remove(recipeId);
+					removeCount++;
+					removed.add(new JsonPrimitive(typeId + " - " + recipeId.toString()));
+				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
+			}
+			for (class_2960 id : new HashSet<>(map.keySet())) {
+				class_1860 recipe = map.get(id);
+				if (removeFor.getOrDefault(type, Collections.emptyList()).contains(recipe.method_8110().method_7909())) {
+					map.remove(id);
+					removeCount++;
+					removed.add(new JsonPrimitive(typeId + " - " + id.toString()));
+				}
+			}
 			for (class_1860<?> recipe : toAdd.getOrDefault(type, new ArrayList<>())) {
 				class_2960 id = recipe.method_8114();
 				if (map.containsKey(id)) {
@@ -87,20 +115,17 @@ public class RecipeTweaker implements Tweaker {
 				} else try {
 					map.put(id, recipe);
 					recipeCount++;
+					added.add(new JsonPrimitive(typeId + " - " + id.toString()));
 				} catch (Exception e) {
 					logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
-			}
-			for (class_2960 recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
-				if (map.containsKey(recipeId)) {
-					map.remove(recipeId);
-					removeCount++;
-				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
 		((RecipeMapAccessor)recipeManager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
 		currentNamespace = "libcd";
+		recipeDebug.put("added", added);
+		recipeDebug.put("removed", removed);
 		canAddRecipes = false;
 	}
 
@@ -131,6 +156,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param id The id of the recipe to remove.
 	 */
 	public void removeRecipe(String id) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
 		class_2960 formatted = new class_2960(id);
 		Optional<? extends class_1860<?>> opt = recipeManager.method_8130(formatted);
 		if (opt.isPresent()) {
@@ -139,6 +165,39 @@ public class RecipeTweaker implements Tweaker {
 			if (!toRemove.containsKey(type)) toRemove.put(type, new ArrayList<>());
 			List<class_2960> removal = toRemove.get(type);
 			removal.add(formatted);
+		}
+	}
+
+	/**
+	 * Remove all recipes outputting a certain item from the recipe manager.
+	 * @param id The id of the output item to remove recipes for.
+	 */
+	public void removeRecipesFor(String id) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
+		class_2960 formatted = new class_2960(id);
+		class_1792 item = class_2378.field_11142.method_10223(formatted);
+		if (item != class_1802.field_8162) {
+			for (class_2960 typeId : class_2378.field_17597.method_10235()) {
+				class_3956 type = class_2378.field_17597.method_10223(typeId);
+				if (!removeFor.containsKey(type)) removeFor.put(type, new ArrayList<>());
+				removeFor.get(type).add(item);
+			}
+		} else {
+			logger.error("Couldn't find item to remove recipes for: " + id);
+		}
+	}
+
+	public void removeRecipesFor(String id, String type) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
+		class_2960 formatted = new class_2960(id);
+		class_2960 typeId = new class_2960(type);
+		class_1792 item = class_2378.field_11142.method_10223(formatted);
+		if (item != class_1802.field_8162) {
+			class_3956 rType = class_2378.field_17597.method_10223(typeId);
+			if (!removeFor.containsKey(rType)) removeFor.put(rType, new ArrayList<>());
+			removeFor.get(rType).add(item);
+		} else {
+			logger.error("Couldn't find item to remove recipes for: " + id);
 		}
 	}
 
@@ -155,6 +214,15 @@ public class RecipeTweaker implements Tweaker {
 		}
 		List<class_1860<?>> recipeList = toAdd.get(type);
 		recipeList.add(recipe);
+	}
+
+	/**
+	 * Begin building a recipe from JSON if the recipe doesn't have intrinsic LibCD support.
+	 * @param type the ID of the recipe serializer to use.
+	 * @return A builder to start the recipe.
+	 */
+	public RecipeBuilder builder(String type) {
+		return new RecipeBuilder(class_2378.field_17598.method_10223(new class_2960(type)));
 	}
 
 	/**
@@ -235,6 +303,7 @@ public class RecipeTweaker implements Tweaker {
 			addRecipe(new class_1869(recipeId, group, width, height, ingredients, stack));
 		} catch (Exception e) {
 			logger.error("Error parsing 1D array shaped recipe - " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -405,5 +474,9 @@ public class RecipeTweaker implements Tweaker {
 
 	public TweakerLogger getLogger() {
 		return logger;
+	}
+
+	public JsonObject getRecipeDebug() {
+		return recipeDebug;
 	}
 }

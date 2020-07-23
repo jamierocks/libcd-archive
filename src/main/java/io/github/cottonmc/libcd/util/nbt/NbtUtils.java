@@ -115,23 +115,23 @@ public class NbtUtils {
 	public static class_2520 getTagFor(Object value) {
 		if (value == null) return null;
 		if (value instanceof Byte) {
-			return new class_2481((byte)value);
+			return class_2481.method_23233((byte) value);
 		} else if (value instanceof Boolean) {
-			return new class_2481((byte)((boolean)value ? 1 : 0));
+			return class_2481.method_23233((byte)((boolean)value ? 1 : 0));
 		} else if (value instanceof Short) {
-			return new class_2516((short)value);
+			return class_2516.method_23254((short)value);
 		} else if (value instanceof Integer) {
-			return new class_2497((int)value);
+			return class_2497.method_23247((int)value);
 		} else if (value instanceof Long) {
-			return new class_2503((long)value);
+			return class_2503.method_23251((long)value);
 		} else if (value instanceof Float) {
-			return new class_2494((float)value);
+			return class_2494.method_23244((float)value);
 		} else if (value instanceof Double) {
-			return new class_2489((double) value);
+			return class_2489.method_23241((double) value);
 		} else if (value instanceof Byte[]) {
 			return new class_2479(Arrays.asList((Byte[])value));
 		} else if (value instanceof String) {
-			return new class_2519((String)value);
+			return class_2519.method_23256((String)value);
 		} else if (value instanceof WrappedListTag) {
 			return ((WrappedListTag)value).getUnderlying();
 		} else if (value instanceof WrappedCompoundTag) {
@@ -140,7 +140,7 @@ public class NbtUtils {
 			return new class_2495(Arrays.asList((Integer[])value));
 		} else if (value instanceof Long[]) {
 			return new class_2501(Arrays.asList((Long[])value));
-		} else return new class_2519(value.toString());
+		} else return class_2519.method_23256(value.toString());
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.impl;
+package io.github.cottonmc.libcd.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -35,8 +35,8 @@ public class HeldItemCommand implements Command<class_2168> {
 		}
 		
 		class_2583 clickableStyle = new class_2583()
-			.method_10949(new class_2568(class_2568.class_2569.field_11762, new class_2585("Click to put this text in the chat bar")))
-			.method_10958(new class_2558(class_2558.class_2559.field_11745, description.toString()));
+			.method_10949(new class_2568(class_2568.class_2569.field_11762, new class_2585("Click to copy to clipboard")))
+			.method_10958(new class_2558(class_2558.class_2559.field_21462, description.toString()));
 		
 		feedback.method_10862(clickableStyle);
 		player.method_9203(feedback);

@@ -10,6 +10,12 @@ var table = TweakerUtils.createItemStack("minecraft:crafting_table");
 //remove the vanilla crafting table recipe, so we can use ours instead
 RecipeTweaker.removeRecipe("minecraft:crafting_table");
 
+//remove all recipes for gold nuggets - make them entirely uncraftable
+RecipeTweaker.removeRecipesFor("minecraft:gold_nugget");
+
+//remove all polished andesite slab recipes obtained by stonecutting
+RecipeTweaker.removeRecipesFor("minecraft:polished_andesite_slab", "minecraft:stonecutting");
+
 //create a recipe for a piece of tall grass and a piece of bonemeal -> a two-high piece of tall grass
 RecipeTweaker.addShapeless(["minecraft:grass", "minecraft:bone_meal"], TweakerUtils.createItemStack("minecraft:tall_grass"));
 
@@ -72,3 +78,17 @@ var logs = TweakerUtils.getItemsInTag("minecraft:logs");
 for (var i = 0; i < logs.length; i++) {
     RecipeTweaker.addStonecutting("#minecraft:logs", logs[i]);
 }
+
+var builder = RecipeTweaker.builder("minecraft:smelting")
+    .ingredient("ingredient", "minecraft:diamond")
+    .itemStack("result", "minecraft:obsidian@8")
+    .property("cookingtime", 200)
+    .property("experience", 0.35);
+
+RecipeTweaker.addRecipe(builder.build());
+
+builder = RecipeTweaker.builder("minecraft:stonecutting")
+    .ingredient("ingredient", "minecraft:diamond_block")
+    .itemStack("result", "minecraft:diamond@9");
+
+RecipeTweaker.addRecipe(builder.build());

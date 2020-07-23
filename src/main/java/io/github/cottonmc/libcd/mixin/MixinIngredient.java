@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(class_1856.class)
 public abstract class MixinIngredient implements IngredientAccessUtils {
 
-	@Shadow private class_1799[] stackArray;
+	@Shadow private class_1799[] matchingStacks;
 
-	@Shadow protected abstract void createStackArray();
+	@Shadow protected abstract void cacheMatchingStacks();
 
 	private NbtMatchType type = NbtMatchType.NONE;
 	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
@@ -65,7 +65,7 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 
 	@Override
 	public class_1799[] libcd_getStackArray() {
-		createStackArray();
-		return stackArray;
+		cacheMatchingStacks();
+		return matchingStacks;
 	}
 }

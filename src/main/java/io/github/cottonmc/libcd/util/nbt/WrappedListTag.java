@@ -3,6 +3,7 @@ package io.github.cottonmc.libcd.util.nbt;
 import net.minecraft.class_2479;
 import net.minecraft.class_2481;
 import net.minecraft.class_2489;
+import net.minecraft.class_2494;
 import net.minecraft.class_2495;
 import net.minecraft.class_2497;
 import net.minecraft.class_2499;
@@ -99,28 +100,28 @@ public class WrappedListTag {
 				return underlying.method_10535(index, NbtUtils.getTagFor(value));
 			case 1:
 				if (value instanceof Byte) {
-					return underlying.method_10535(index, new class_2481((Byte)value));
+					return underlying.method_10535(index, class_2481.method_23233((Byte)value));
 				} else return false;
 			case 2:
-				if (value instanceof Short) return underlying.method_10535(index, new class_2516((Short)value));
+				if (value instanceof Short) return underlying.method_10535(index, class_2516.method_23254((Short)value));
 				 else return false;
 			case 3:
-				if (value instanceof Integer) return underlying.method_10535(index, new class_2497((Integer)value));
+				if (value instanceof Integer) return underlying.method_10535(index, class_2497.method_23247((Integer)value));
 				else return false;
 			case 4:
-				if (value instanceof Long) return underlying.method_10535(index, new class_2503((Long)value));
+				if (value instanceof Long) return underlying.method_10535(index, class_2503.method_23251((Long)value));
 				else return false;
 			case 5:
-				if (value instanceof Float) return underlying.method_10535(index, new class_2503((Long)value));
+				if (value instanceof Float) return underlying.method_10535(index, class_2494.method_23244((Float)value));
 				else return false;
 			case 6:
-				if (value instanceof Double) return underlying.method_10535(index, new class_2489((Long)value));
+				if (value instanceof Double) return underlying.method_10535(index, class_2489.method_23241((Double)value));
 				else return false;
 			case 7:
 				if (value instanceof Byte[]) return underlying.method_10535(index, new class_2479(Arrays.asList((Byte[])value)));
 				else return false;
 			case 8:
-				if (value instanceof String) return underlying.method_10535(index, new class_2519((String)value));
+				if (value instanceof String) return underlying.method_10535(index, class_2519.method_23256((String)value));
 				else return false;
 			case 9:
 				if (value instanceof WrappedListTag) return underlying.method_10535(index, ((WrappedListTag)value).getUnderlying());
@@ -159,28 +160,28 @@ public class WrappedListTag {
 				return underlying.method_10533(index, NbtUtils.getTagFor(value));
 			case 1:
 				if (value instanceof Byte) {
-					return underlying.method_10533(index, new class_2481((Byte)value));
+					return underlying.method_10533(index, class_2481.method_23233((Byte)value));
 				} else return false;
 			case 2:
-				if (value instanceof Short) return underlying.method_10533(index, new class_2516((Short)value));
+				if (value instanceof Short) return underlying.method_10533(index, class_2516.method_23254((Short)value));
 				else return false;
 			case 3:
-				if (value instanceof Integer) return underlying.method_10533(index, new class_2497((Integer)value));
+				if (value instanceof Integer) return underlying.method_10533(index, class_2497.method_23247((Integer)value));
 				else return false;
 			case 4:
-				if (value instanceof Long) return underlying.method_10533(index, new class_2503((Long)value));
+				if (value instanceof Long) return underlying.method_10533(index, class_2503.method_23251((Long)value));
 				else return false;
 			case 5:
-				if (value instanceof Float) return underlying.method_10533(index, new class_2503((Long)value));
+				if (value instanceof Float) return underlying.method_10533(index, class_2494.method_23244((Float)value));
 				else return false;
 			case 6:
-				if (value instanceof Double) return underlying.method_10533(index, new class_2489((Long)value));
+				if (value instanceof Double) return underlying.method_10533(index, class_2489.method_23241((Double)value));
 				else return false;
 			case 7:
 				if (value instanceof Byte[]) return underlying.method_10533(index, new class_2479(Arrays.asList((Byte[])value)));
 				else return false;
 			case 8:
-				if (value instanceof String) return underlying.method_10533(index, new class_2519((String)value));
+				if (value instanceof String) return underlying.method_10533(index, class_2519.method_23256((String)value));
 				else return false;
 			case 9:
 				if (value instanceof WrappedListTag) return underlying.method_10533(index, ((WrappedListTag)value).getUnderlying());

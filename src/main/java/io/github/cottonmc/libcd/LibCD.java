@@ -5,11 +5,13 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import io.github.cottonmc.jankson.JanksonFactory;
+import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.condition.ConditionalData;
-import io.github.cottonmc.libcd.impl.HeldItemCommand;
+import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.tweaker.*;
 import io.github.cottonmc.libcd.util.CDConfig;
 import io.github.cottonmc.libcd.util.TweakerLogger;
@@ -27,12 +29,8 @@ import net.minecraft.class_2170;
 import net.minecraft.class_2588;
 import net.minecraft.class_2960;
 import net.minecraft.class_3264;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.function.Predicate;
 
 public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";
@@ -62,26 +60,49 @@ public class LibCD implements ModInitializer {
 			return class_1844.method_8061(new class_1799(class_1802.field_8574), potion);
 		});
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
-			dispatcher.register(
-				class_2170.method_9247("cd_subset").requires(source -> source.method_9259(3))
-						.then(class_2170.method_9244("subset", StringArgumentType.string())
-								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
-						.then(class_2170.method_9247("-reset").executes(context -> changeSubset(context, "")))
-			);
-			
 			
 			//New nodes
 			LiteralCommandNode<class_2168> libcdNode = class_2170
 					.method_9247("libcd")
+					.build();
+
+			LiteralCommandNode<class_2168> subsetNode = class_2170
+					.method_9247("subset")
+					.requires(source -> source.method_9259(3))
+					.build();
+
+			ArgumentCommandNode<class_2168, String> setSubsetNode = class_2170
+					.method_9244("subset", StringArgumentType.string())
+					.executes(context -> changeSubset(context, context.getArgument("subset", String.class)))
+					.build();
+
+			LiteralCommandNode<class_2168> resetSubsetNode = class_2170
+					.method_9247("-reset")
+					.executes(context -> changeSubset(context, ""))
 					.build();
 			
 			LiteralCommandNode<class_2168> heldNode = class_2170
 					.method_9247("held")
 					.executes(new HeldItemCommand())
 					.build();
-			
+
+			LiteralCommandNode<class_2168> debugNode = class_2170
+					.method_9247("debug")
+					.requires(source -> source.method_9259(3))
+					.build();
+
+			LiteralCommandNode<class_2168> debugExportNode = class_2170
+					.method_9247("export")
+					.executes(new DebugExportCommand())
+					.build();
+
 			//Stitch nodes together
+			subsetNode.addChild(setSubsetNode);
+			subsetNode.addChild(resetSubsetNode);
+			libcdNode.addChild(subsetNode);
 			libcdNode.addChild(heldNode);
+			debugNode.addChild(debugExportNode);
+			libcdNode.addChild(debugNode);
 			dispatcher.getRoot().addChild(libcdNode);
 			
 		});
