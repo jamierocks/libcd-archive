@@ -10,11 +10,15 @@ import net.minecraft.class_1802;
 import net.minecraft.class_1842;
 import net.minecraft.class_1844;
 import net.minecraft.class_1847;
+import net.minecraft.class_1887;
 import net.minecraft.class_2248;
 import net.minecraft.class_2371;
 import net.minecraft.class_2378;
 import net.minecraft.class_2487;
+import net.minecraft.class_2499;
+import net.minecraft.class_2519;
 import net.minecraft.class_2522;
+import net.minecraft.class_2585;
 import net.minecraft.class_2960;
 import net.minecraft.class_3414;
 import net.minecraft.class_3489;
@@ -126,6 +130,61 @@ public class TweakerUtils {
 		} catch (CommandSyntaxException e) {
 			LibCD.logger.error("Error adding NBT to stack: " + e.getMessage());
 		}
+		return stack;
+	}
+
+	/**
+	 * Add an enchantment to an ItemStack. Will ignore whether the enchantment fits on the stack.
+	 * @param stack The stack to enchant.
+	 * @param enchantment The ID of the enchantment to add.
+	 * @param level The level of the enchantment to add.
+	 * @return The stack with the new enchantment.
+	 */
+	public static class_1799 enchant(class_1799 stack, String enchantment, int level) {
+		class_1887 ench = class_2378.field_11160.method_10223(new class_2960(enchantment));
+		stack.method_7978(ench, level);
+		return stack;
+	}
+
+	/**
+	 * Add lore messages to an ItemStack.
+	 * @param stack The stack to add lroe to.
+	 * @param lore The lines to add to lore. Use § to change the color of the messages.
+	 * @return The stack with the new lore.
+	 */
+	public static class_1799 addLore(class_1799 stack, String[] lore) {
+		class_2487 display = stack.method_7911("display");
+		if (!display.method_10545("Lore")) display.method_10566("Lore", new class_2499());
+		if (display.method_10573("Lore", 9)) {
+			class_2499 list = display.method_10554("Lore", 8);
+			for (int i = 0; i < lore.length; i++) {
+				String line = lore[i];
+				list.method_10533(i, new class_2519(line));
+			}
+		}
+		return stack;
+	}
+
+	/**
+	 * Set the damage on an ItemStack. Counts up from 0 to the item's max damage.
+	 * @param stack The stack to set damage on.
+	 * @param amount How much damage to apply, or -1 to make unbreakable.
+	 * @return The stack with the new damage.
+	 */
+	public static class_1799 setDamage(class_1799 stack, int amount) {
+		if (amount == -1) stack.method_7948().method_10556("Unbreakable", true);
+		else stack.method_7974(amount);
+		return stack;
+	}
+
+	/**
+	 * Set the custom name on an ItemStack.
+	 * @param stack The stack to set the name on.
+	 * @param name The name to set to. Use § to change the color of the name.
+	 * @return The stack with the new name.
+	 */
+	public static class_1799 setName(class_1799 stack, String name) {
+		stack.method_7977(new class_2585(name));
 		return stack;
 	}
 

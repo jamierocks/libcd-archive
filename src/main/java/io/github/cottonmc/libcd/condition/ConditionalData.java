@@ -10,15 +10,43 @@ import net.minecraft.class_2960;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
 public class ConditionalData {
 	private static final Map<class_2960, Predicate<Object>> conditions = new HashMap<>();
 
+	@SuppressWarnings("unchecked")
 	public static void init() {
-		registerCondition(new class_2960(LibCD.MODID, "mod_loaded"), (value) -> value instanceof String && FabricLoader.getInstance().isModLoaded((String)value));
-		registerCondition(new class_2960(LibCD.MODID, "item_exists"), (value) -> value instanceof String && class_2378.field_11142.method_10223(new class_2960((String)value)) != class_1802.field_8162);
+		registerCondition(new class_2960(LibCD.MODID, "mod_loaded"), (value) -> {
+			if (value instanceof String) return FabricLoader.getInstance().isModLoaded((String) value);
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) return false;
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!FabricLoader.getInstance().isModLoaded((String)obj)) return false;
+					}  else return false;
+				}
+				return true;
+			}
+			return false;
+		});
+		registerCondition(new class_2960(LibCD.MODID, "item_exists"), (value) -> {
+			if (value instanceof String) return class_2378.field_11142.method_10223(new class_2960((String)value)) != class_1802.field_8162;
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) return false;
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (class_2378.field_11142.method_10223(new class_2960((String)obj)) == class_1802.field_8162) return false;
+					}  else return false;
+				}
+				return true;
+			}
+			return false;
+		});
 		registerCondition(new class_2960(LibCD.MODID, "not"), (value) -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
@@ -75,7 +103,7 @@ public class ConditionalData {
 		} else if (element instanceof JsonNull) {
 			return null;
 		} else if (element instanceof JsonArray) {
-			return new ArrayList<>((JsonArray)element);
+			return new ArrayList<>((JsonArray) element);
 		} else {
 			return element;
 		}
