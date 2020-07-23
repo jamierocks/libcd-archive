@@ -1,7 +1,7 @@
-package io.github.cottonmc.libcd.util;
+package io.github.cottonmc.libcd.api.util;
 
-import io.github.cottonmc.libcd.util.nbt.NbtUtils;
-import io.github.cottonmc.libcd.util.nbt.WrappedCompoundTag;
+import io.github.cottonmc.libcd.api.util.nbt.NbtUtils;
+import io.github.cottonmc.libcd.api.util.nbt.WrappedCompoundTag;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.class_1799;

@@ -4,7 +4,9 @@ import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.cottonmc.libcd.tweaker.RecipeTweaker;
+import io.github.cottonmc.libcd.api.tweaker.Tweaker;
+import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_2168;
 import net.minecraft.class_2585;
@@ -16,7 +18,10 @@ public class DebugExportCommand implements Command<class_2168> {
 	public int run(CommandContext<class_2168> context) throws CommandSyntaxException {
 		try {
 			File file = FabricLoader.getInstance().getGameDirectory().toPath().resolve("debug/libcd.json5").toFile();
-			JsonObject json = RecipeTweaker.INSTANCE.getRecipeDebug();
+			JsonObject json = new JsonObject();
+			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
+				json.put(TweakerManager.INSTANCE.getTweakerName(tweaker), tweaker.getDebugInfo());
+			}
 			String result = json.toJson(true, true);
 			if (!file.exists()) {
 				file.getParentFile().mkdirs();

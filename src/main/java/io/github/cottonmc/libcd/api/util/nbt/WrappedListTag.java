@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util.nbt;
+package io.github.cottonmc.libcd.api.util.nbt;
 
 import net.minecraft.class_2479;
 import net.minecraft.class_2481;
@@ -85,7 +85,7 @@ public class WrappedListTag {
 	 * @return The object form of the tag at that point.
 	 */
 	public Object get(int index) {
-		return NbtUtils.getObjectFor(underlying.get(index));
+		return NbtUtils.getObjectFor(underlying.method_10534(index));
 	}
 
 	/**
@@ -212,9 +212,7 @@ public class WrappedListTag {
 	 * Empty all entries from the list, and reset its type.
 	 */
 	public void clear() {
-		for (int i = 0; i < getSize(); i++) {
-			underlying.method_10536(i);
-		}
+		underlying.clear();
 	}
 
 	/**

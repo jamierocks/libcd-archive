@@ -30,7 +30,7 @@ public class MixinCookingRecipeSerializer {
 		this.invoker = (CookingRecipeFactoryInvoker) invoker;
 	}
 
-	@Inject(method = "method_17736", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
+	@Inject(method = "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/AbstractCookingRecipe;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
 			cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void read(class_2960 id, JsonObject json, CallbackInfoReturnable info,
 					  String group, JsonElement ingElem, class_1856 ingredient) {
@@ -39,7 +39,7 @@ public class MixinCookingRecipeSerializer {
 			class_1799 stack = class_1869.method_8155((JsonObject)elem);
 			float experience = class_3518.method_15277(json, "experience", 0.0F);
 			int cookingtime = class_3518.method_15282(json, "cookingtime", this.cookingTime);
-			info.setReturnValue(invoker.libcd_create(id, group, ingredient, stack, experience, cookingtime));
+			info.setReturnValue(invoker.libcd$create(id, group, ingredient, stack, experience, cookingtime));
 		}
 	}
 }

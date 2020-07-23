@@ -6,6 +6,6 @@ import net.minecraft.class_2960;
 import net.minecraft.class_3956;
 
 public interface RecipeMapAccessor {
-	Map<class_3956<?>, Map<class_2960, class_1860<?>>> libcd_getRecipeMap();
-	void libcd_setRecipeMap(Map<class_3956<?>, Map<class_2960, class_1860<?>>> map);
+	Map<class_3956<?>, Map<class_2960, class_1860<?>>> libcd$getRecipeMap();
+	void libcd$setRecipeMap(Map<class_3956<?>, Map<class_2960, class_1860<?>>> map);
 }

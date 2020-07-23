@@ -4,5 +4,5 @@ import java.util.List;
 import net.minecraft.class_3302;
 
 public interface ReloadListenersAccessor {
-	List<class_3302> libcd_getListeners();
+	List<class_3302> libcd$getListeners();
 }

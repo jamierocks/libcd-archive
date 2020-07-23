@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 public interface MixinCuttingRecipeFactory<T extends class_3972> extends CuttingRecipeFactoryInvoker {
 	@Shadow T create(class_2960 identifier, String s, class_1856 ingredient, class_1799 itemStack);
 
-	default T libcd_create(class_2960 id, String group, class_1856 input, class_1799 output) {
+	default T libcd$create(class_2960 id, String group, class_1856 input, class_1799 output) {
 		return create(id, group, input, output);
 	}
 }

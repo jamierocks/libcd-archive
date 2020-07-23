@@ -1,6 +1,7 @@
 package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.impl.ResourceSearcher;
@@ -45,7 +46,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 			//don't try to load for things that use mcmetas already!
 			if (id.method_12832().contains(".mcmeta") || id.method_12832().contains(".png")) continue;
 			class_2960 metaId = new class_2960(id.method_12836(), id.method_12832() + ".mcmeta");
-			if (libcd_contains(metaId)) {
+			if (libcd$contains(metaId)) {
 				try {
 					class_3298 meta = method_14486(metaId);
 					String metaText = IOUtils.toString(meta.method_14482());
@@ -53,20 +54,20 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
-					LibCD.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
+					CDCommons.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
 				}
 			}
 		}
 	}
 
 	@Override
-	public List<class_3302> libcd_getListeners() {
+	public List<class_3302> libcd$getListeners() {
 		return listeners;
 	}
 
-	public boolean libcd_contains(class_2960 id) {
+	public boolean libcd$contains(class_2960 id) {
 		class_3300 manager = this.namespaceManagers.get(id.method_12836());
-		return manager != null && ((ResourceSearcher) manager).libcd_contains(id);
+		return manager != null && ((ResourceSearcher) manager).libcd$contains(id);
 	}
 
 

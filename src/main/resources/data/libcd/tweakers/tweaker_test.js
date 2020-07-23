@@ -2,6 +2,10 @@
 log.info("WARNING! LibCD Tweaker sample script is running!");
 log.info("If you are not in a dev environment, please report this!");
 
+//imports - use `libcd.require`
+var RecipeTweaker = libcd.require("libcd.recipe.RecipeTweaker");
+var TweakerUtils = libcd.require("libcd.util.TweakerUtils");
+
 //A shorthand to get a stick input
 var stick = "minecraft:stick";
 //A shorthand to get a crafting table output
@@ -16,8 +20,8 @@ RecipeTweaker.removeRecipesFor("minecraft:gold_nugget");
 //remove all polished andesite slab recipes obtained by stonecutting
 RecipeTweaker.removeRecipesFor("minecraft:polished_andesite_slab", "minecraft:stonecutting");
 
-//create a recipe for a piece of tall grass and a piece of bonemeal -> a two-high piece of tall grass
-RecipeTweaker.addShapeless(["minecraft:grass", "minecraft:bone_meal"], TweakerUtils.createItemStack("minecraft:tall_grass"));
+//create a recipe for a piece of tall grass and a piece of bonemeal or white dye -> a two-high piece of tall grass
+RecipeTweaker.addShapeless(["minecraft:grass", RecipeTweaker.makeIngredient("fuzzy", "minecraft:bone_meal", "minecraft:white_dye")], TweakerUtils.createItemStack("minecraft:tall_grass"));
 
 //create a recipe for a stone pickaxe and a diamond -> a diamond pickaxe with 1 durability left
 RecipeTweaker.addShapeless(["minecraft:stone_pickaxe", "minecraft:diamond"], TweakerUtils.createItemStack("minecraft:diamond_pickaxe{Damage:1560}"));
@@ -92,3 +96,18 @@ builder = RecipeTweaker.builder("minecraft:stonecutting")
     .itemStack("result", "minecraft:diamond@9");
 
 RecipeTweaker.addRecipe(builder.build());
+
+//import the stuff we need for loot tables
+var LootTweaker = libcd.require("libcd.loot.LootTweaker");
+var Conditions = libcd.require("libcd.loot.Conditions");
+var Functions = libcd.require("libcd.loot.Functions");
+var Entries = libcd.require("libcd.loot.Entries");
+
+//start messing with loot tables!
+var sheepTable = LootTweaker.getTable("minecraft:entities/sheep");
+var mainPool = sheepTable.getPool(0);
+mainPool.removeEntry("minecraft:item", "minecraft:mutton");
+var prismarineEntry = Entries.item("minecraft:prismarine_shard")
+    .addFunctions(Functions.countExact(5))
+    .addConditions(Conditions.killedByPlayer());
+mainPool.addEntries(prismarineEntry);

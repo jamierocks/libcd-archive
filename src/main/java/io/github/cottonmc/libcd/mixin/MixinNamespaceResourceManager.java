@@ -20,7 +20,7 @@ public abstract class MixinNamespaceResourceManager implements class_3300, Resou
 
 	@Shadow protected abstract boolean isPathAbsolute(class_2960 id);
 
-	public boolean libcd_contains(class_2960 id) {
+	public boolean libcd$contains(class_2960 id) {
 		if (!this.isPathAbsolute(id)) {
 			return false;
 		} else {

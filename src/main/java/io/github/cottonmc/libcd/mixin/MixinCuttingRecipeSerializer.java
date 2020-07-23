@@ -25,14 +25,14 @@ public class MixinCuttingRecipeSerializer {
 		this.invoker = (CuttingRecipeFactoryInvoker) invoker;
 	}
 
-	@Inject(method = "method_17881", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
+	@Inject(method = "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
 			cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void read(class_2960 id, JsonObject json, CallbackInfoReturnable info,
 					  String group, class_1856 ingredient) {
 		JsonElement elem = json.get("result");
 		if (elem instanceof JsonObject) {
 			class_1799 stack = class_1869.method_8155((JsonObject)elem);
-			info.setReturnValue(invoker.libcd_create(id, group, ingredient, stack));
+			info.setReturnValue(invoker.libcd$create(id, group, ingredient, stack));
 		}
 	}
 }

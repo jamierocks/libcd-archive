@@ -1,10 +1,12 @@
-package io.github.cottonmc.libcd.tag;
+package io.github.cottonmc.libcd.loader;
 
 import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.condition.ConditionalData;
+import io.github.cottonmc.libcd.api.CDCommons;
+import io.github.cottonmc.libcd.api.CDSyntaxError;
+import io.github.cottonmc.libcd.api.condition.ConditionalData;
 import javax.annotation.Nullable;
 import net.minecraft.class_2960;
 import net.minecraft.class_3494;
@@ -93,12 +95,17 @@ public final class TagExtensions {
 
         JsonObject obj = (JsonObject) condition;
         for (String key : obj.keySet()) {
-            class_2960 id = key.equals("or") ? new class_2960(LibCD.MODID, "or") : class_2960.method_12829(key);
+            class_2960 id = key.equals("or") ? new class_2960(CDCommons.MODID, "or") : class_2960.method_12829(key);
             if (id == null || !ConditionalData.hasCondition(id)) {
                 warnings.add("Found unknown condition: " + key);
             }
 
-            if (!ConditionalData.testCondition(id, ConditionalData.parseElement(obj.get(key)))) return false;
+            try {
+                if (!ConditionalData.testCondition(id, ConditionalData.parseElement(obj.get(key)))) return false;
+            } catch (CDSyntaxError e) {
+                warnings.add("Error parsing tag extensions: item '" + condition + "' in condition list errored: " + e.getMessage());
+                return false;
+            }
         }
         return true;
     }

@@ -6,5 +6,5 @@ import net.minecraft.class_1874;
 import net.minecraft.class_2960;
 
 public interface CookingRecipeFactoryInvoker<T extends class_1874> {
-	T libcd_create(class_2960 id, String group, class_1856 ingredient, class_1799 output, float experience, int cookingTime);
+	T libcd$create(class_2960 id, String group, class_1856 ingredient, class_1799 output, float experience, int cookingTime);
 }

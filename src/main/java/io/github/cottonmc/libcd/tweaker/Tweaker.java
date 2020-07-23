@@ -1,5 +1,7 @@
 package io.github.cottonmc.libcd.tweaker;
 
+import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.legacy.LegacyTweaker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,18 +11,11 @@ import java.util.function.Function;
 import net.minecraft.class_2960;
 import net.minecraft.class_3300;
 
+@Deprecated
+/**
+ * Use {@link io.github.cottonmc.libcd.api.tweaker.Tweaker} instead
+ */
 public interface Tweaker {
-	List<Tweaker> TWEAKERS = new ArrayList<>();
-	Map<String, Function<class_2960, Object>> ASSISTANTS = new HashMap<>();
-
-	/**
-	 * Deprecated; use {@link Tweaker#addTweaker(String, Tweaker)} instead, as it will add the object as an assistant too.
-	 * @param tweaker The tweaker to add.
-	 */
-	@Deprecated
-	static void addTweaker(Tweaker tweaker) {
-		TWEAKERS.add(tweaker);
-	}
 
 	/**
 	 * Add a new tweaker to store data in.
@@ -28,11 +23,7 @@ public interface Tweaker {
 	 * @param tweaker An instanceof Tweaker to call whenever reloading.
 	 */
 	static void addTweaker(String callName, Tweaker tweaker) {
-		TWEAKERS.add(tweaker);
-		ASSISTANTS.put(callName, (id) -> {
-			tweaker.prepareFor(id);
-			return tweaker;
-		});
+		TweakerManager.INSTANCE.addTweaker(callName, new LegacyTweaker(tweaker));
 	}
 
 	/**
@@ -42,7 +33,7 @@ public interface Tweaker {
 	 * @param assistant An object of a class to use in scripts.
 	 */
 	static void addAssistant(String callName, Object assistant) {
-		ASSISTANTS.put(callName, id -> assistant);
+		TweakerManager.INSTANCE.addLegacyAssistant(callName, assistant);
 	}
 
 	/**
@@ -51,7 +42,7 @@ public interface Tweaker {
 	 * @param assistant A function that takes an identifier and returns an object of a class to use in scripts.
 	 */
 	static void addAssistantFactory(String callName, Function<class_2960, Object> assistant) {
-		ASSISTANTS.put(callName, assistant);
+		TweakerManager.INSTANCE.addLegacyAssistantFactory(callName, assistant);
 	}
 
 	/**

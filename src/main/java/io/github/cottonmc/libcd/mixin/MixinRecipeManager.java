@@ -11,17 +11,17 @@ import net.minecraft.class_2960;
 import net.minecraft.class_3956;
 
 @Mixin(class_1863.class)
-public abstract class MixinRecipeManager implements RecipeMapAccessor {
+public class MixinRecipeManager implements RecipeMapAccessor {
 	@Shadow
 	private Map<class_3956<?>, Map<class_2960, class_1860<?>>> recipes;
 
 	@Override
-	public Map<class_3956<?>, Map<class_2960, class_1860<?>>> libcd_getRecipeMap() {
+	public Map<class_3956<?>, Map<class_2960, class_1860<?>>> libcd$getRecipeMap() {
 		return recipes;
 	}
 
 	@Override
-	public void libcd_setRecipeMap(Map<class_3956<?>, Map<class_2960, class_1860<?>>> map) {
+	public void libcd$setRecipeMap(Map<class_3956<?>, Map<class_2960, class_1860<?>>> map) {
 		recipes = map;
 	}
 }

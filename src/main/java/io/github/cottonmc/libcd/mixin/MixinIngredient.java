@@ -1,11 +1,11 @@
 package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
-import io.github.cottonmc.libcd.util.NbtMatchType;
 import net.minecraft.class_1799;
 import net.minecraft.class_1856;
 import net.minecraft.class_2487;
 import net.minecraft.class_2520;
+import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +21,7 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 	@Shadow protected abstract void cacheMatchingStacks();
 
 	private NbtMatchType type = NbtMatchType.NONE;
-	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	@Inject(method = "test", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkStackNbt(class_1799 test, CallbackInfoReturnable<Boolean> cir, class_1799[] stackArray, int arrayLength, int i, class_1799 testAgainst) {
 		if (!testAgainst.method_7985() || test.method_7969().isEmpty()) {
 			if (type == NbtMatchType.EXACT && (test.method_7985() && !test.method_7969().isEmpty())) cir.setReturnValue(false);
@@ -59,12 +59,12 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 
 
 	@Override
-	public void libcd_setMatchType(NbtMatchType type) {
+	public void libcd$setMatchType(NbtMatchType type) {
 		this.type = type;
 	}
 
 	@Override
-	public class_1799[] libcd_getStackArray() {
+	public class_1799[] libcd$getStackArray() {
 		cacheMatchingStacks();
 		return matchingStacks;
 	}
