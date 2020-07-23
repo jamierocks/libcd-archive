@@ -60,15 +60,16 @@ public class ConditionalData {
 			}
 			return false;
 		});
-		registerCondition(new class_2960(LibCD.MODID, "any_of"), (value) -> {
-			if (value instanceof JsonObject) {
-				JsonObject json = (JsonObject)value;
-				for (String key : json.keySet()) {
-					class_2960 id = new class_2960(key);
-					Object result = parseElement(json.get(key));
-					if (hasCondition(id)) {
-						if (testCondition(id, result)) return true;
-					} else return false;
+		registerCondition(new class_2960(LibCD.MODID, "or"), (value) -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (!testCondition(new class_2960(key), obj)) return false;
+						}
+					}
 				}
 			}
 			return false;
@@ -76,17 +77,21 @@ public class ConditionalData {
 	}
 
 	public static boolean shouldLoad(class_2960 resourceId, String meta) {
-		Jankson jankson = new Jankson.Builder().build();
 		try {
-			JsonObject json = jankson.load(meta);
-			for (String key : json.keySet()) {
-				class_2960 id = new class_2960(key);
-				Object result = parseElement(json.get(key));
-				if (hasCondition(id)) {
-					if (!testCondition(id, result)) return false;
-				} else {
-					LibCD.logger.error("Error parsing meta for {}: could not find condition {}", resourceId, id.toString());
-					return false;
+			JsonObject json = LibCD.jankson.load(meta);
+			JsonElement elem = json.get("when");
+			if (elem instanceof JsonArray) {
+				JsonArray array = (JsonArray)elem;
+				for (JsonElement condition : array) {
+					if (!(condition instanceof JsonObject)) {
+						LibCD.logger.error("Error parsing meta for {}: item {} in condition list not a JsonObject", resourceId, condition.toString());
+						return false;
+					}
+					JsonObject obj = (JsonObject)condition;
+					for (String key : obj.keySet()) {
+						class_2960 id = key.equals("or")? new class_2960(LibCD.MODID, "or") : new class_2960(key);
+						if (!testCondition(id, obj)) return false;
+					}
 				}
 			}
 			return true;
@@ -102,8 +107,6 @@ public class ConditionalData {
 			return ((JsonPrimitive)element).getValue();
 		} else if (element instanceof JsonNull) {
 			return null;
-		} else if (element instanceof JsonArray) {
-			return new ArrayList<>((JsonArray) element);
 		} else {
 			return element;
 		}
@@ -123,7 +126,10 @@ public class ConditionalData {
 	}
 
 	public static boolean testCondition(class_2960 id, Object toTest) {
-		if (!hasCondition(id)) return false;
+		if (!hasCondition(id)) {
+			//put a log here if I can find a way to get it to trace back to which file it should check?
+			return false;
+		}
 		return conditions.get(id).test(toTest);
 	}
 }

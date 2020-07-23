@@ -72,7 +72,7 @@ public class RecipeTweaker implements Tweaker {
 		types.addAll(toAdd.keySet());
 		for (class_3956<?> type : types) {
 			Map<class_2960, class_1860<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
-			for (class_1860<?> recipe : toAdd.get(type)) {
+			for (class_1860<?> recipe : toAdd.getOrDefault(type, new ArrayList<>())) {
 				class_2960 id = recipe.method_8114();
 				if (map.containsKey(id)) {
 					LibCD.logger.error("Failed to add recipe from tweaker - duplicate recipe ID: " + id);
