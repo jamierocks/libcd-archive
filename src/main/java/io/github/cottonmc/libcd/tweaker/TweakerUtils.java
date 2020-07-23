@@ -98,6 +98,15 @@ public class TweakerUtils {
 	/**
 	 * Create an item stack from an item id.
 	 * @param id The id of the item to get, along with any NBT.
+	 * @return An item stack of the specified item, with an amount of 1.
+	 */
+	public class_1799 createItemStack(String id) {
+		return createItemStack(id, 1);
+	}
+
+	/**
+	 * Create an item stack from an item id.
+	 * @param id The id of the item to get, along with any NBT.
 	 * @param amount The amount of the item in the stack.
 	 * @return An item stack of the specified item and amount.
 	 */
@@ -110,6 +119,15 @@ public class TweakerUtils {
 			class_1799 stack = new class_1799(item, amount);
 			return addNbtToStack(stack, id.substring(index));
 		}
+	}
+
+	/**
+	 * Create an item stack from an item.
+	 * @param item The item to have a stack of.
+	 * @return An item stack of the specified item, with an amount of 1.
+	 */
+	public class_1799 createItemStack(class_1792 item) {
+		return createItemStack(item, 1);
 	}
 
 	/**
