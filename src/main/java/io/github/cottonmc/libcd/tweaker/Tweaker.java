@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
+import net.minecraft.class_2960;
 import net.minecraft.class_3300;
 
 public interface Tweaker {
 	List<Tweaker> TWEAKERS = new ArrayList<>();
-	Map<String, Object> ASSISTANTS = new HashMap<>();
+	Map<String, Function<class_2960, Object>> ASSISTANTS = new HashMap<>();
 
 	/**
 	 * Deprecated; use {@link Tweaker#addTweaker(String, Tweaker)} instead, as it will add the object as an assistant too.
@@ -22,21 +24,33 @@ public interface Tweaker {
 
 	/**
 	 * Add a new tweaker to store data in.
-	 * @param callName A unique name to call this tweaker by in scripts. Names shared with addAssistant.
+	 * @param callName A unique name to call this tweaker by in scripts. Names shared with addAssistant(Factory).
 	 * @param tweaker An instanceof Tweaker to call whenever reloading.
 	 */
 	static void addTweaker(String callName, Tweaker tweaker) {
 		TWEAKERS.add(tweaker);
-		ASSISTANTS.put(callName, tweaker);
+		ASSISTANTS.put(callName, (id) -> {
+			tweaker.prepareFor(id);
+			return tweaker;
+		});
 	}
 
 	/**
 	 * Add a new assistant class for tweakers to access.
 	 * DO NOT PASS TWEAKER INSTANCES HERE. They are automatically added in addTweaker.
-	 * @param callName A unique name to call this object by in scripts. Names shared with addTweaker.
+	 * @param callName A unique name to call this object by in scripts. Names shared with addTweaker and addAssistantFactory.
 	 * @param assistant An object of a class to use in scripts.
 	 */
 	static void addAssistant(String callName, Object assistant) {
+		ASSISTANTS.put(callName, id -> assistant);
+	}
+
+	/**
+	 * Add a factory for assistants which has methods affected by Script ID.
+	 * @param callName A unique name to call this object by in scripts. Names shared with addTweaker and addAssistant.
+	 * @param assistant A function that takes an identifier and returns an object of a class to use in scripts.
+	 */
+	static void addAssistantFactory(String callName, Function<class_2960, Object> assistant) {
 		ASSISTANTS.put(callName, assistant);
 	}
 
@@ -60,4 +74,10 @@ public interface Tweaker {
 	 * @return The number of applied tweaks and the description of what type of tweak it is, ex. "12 recipes"
 	 */
 	String getApplyMessage();
+
+	/**
+	 * Prepare anything needed based on the script ID, like namespaces. Called before each script is run.
+	 * @param scriptId The ID of the script about to be run.
+	 */
+	default void prepareFor(class_2960 scriptId) {}
 }

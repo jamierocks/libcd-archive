@@ -1,11 +1,11 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.util.NbtMatchType;
+import io.github.cottonmc.libcd.util.TweakerLogger;
 import net.minecraft.class_1799;
 import net.minecraft.class_1856;
 import net.minecraft.class_1860;
@@ -35,6 +35,9 @@ public class RecipeTweaker implements Tweaker {
 	private int removeCount;
 	private Map<class_3956<?>, List<class_1860<?>>> toAdd = new HashMap<>();
 	private Map<class_3956<?>, List<class_2960>> toRemove = new HashMap<>();
+	private String currentNamespace = "libcd";
+	private boolean canAddRecipes = false;
+	private TweakerLogger logger;
 
 	/**
 	 * Used during data pack loading to set up recipe adding.
@@ -52,13 +55,14 @@ public class RecipeTweaker implements Tweaker {
 			for (class_3302 listener : listeners) {
 				if (listener instanceof class_1863) {
 					this.recipeManager = (class_1863)listener;
+					canAddRecipes = true;
 					return;
 				}
 			}
-			LibCD.logger.error("No recipe manager was found! Tweaker cannot register recipes!");
+			logger.error("No recipe manager was found! Tweaker cannot register recipes!");
 			throw new IllegalStateException("No recipe manager was found! Tweaker cannot register recipes!");
 		}
-		LibCD.logger.error("No reload listeners accessor found! Tweaker cannot register recipes!");
+		logger.error("No reload listeners accessor found! Tweaker cannot register recipes!");
 		throw new IllegalStateException("No reload listeners accessor found! Tweaker cannot register recipes!");
 	}
 
@@ -79,28 +83,36 @@ public class RecipeTweaker implements Tweaker {
 			for (class_1860<?> recipe : toAdd.getOrDefault(type, new ArrayList<>())) {
 				class_2960 id = recipe.method_8114();
 				if (map.containsKey(id)) {
-					LibCD.logger.error("Failed to add recipe from tweaker - duplicate recipe ID: " + id);
+					logger.error("Failed to add recipe from tweaker - duplicate recipe ID: " + id);
 				} else try {
 					map.put(id, recipe);
 					recipeCount++;
 				} catch (Exception e) {
-					LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
+					logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
 			}
 			for (class_2960 recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
 				if (map.containsKey(recipeId)) {
 					map.remove(recipeId);
 					removeCount++;
-				} else LibCD.logger.error("Could not find recipe to remove: " + recipeId.toString());
+				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
 		((RecipeMapAccessor)recipeManager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
+		currentNamespace = "libcd";
+		canAddRecipes = false;
 	}
 
 	@Override
 	public String getApplyMessage() {
 		return recipeCount + " " + (recipeCount == 1? "recipe" : "recipes" + (removeCount == 0? "" : " (" + removeCount + " removed)"));
+	}
+
+	@Override
+	public void prepareFor(class_2960 scriptId) {
+		this.currentNamespace = scriptId.method_12836();
+		this.logger = new TweakerLogger(scriptId.method_12836());
 	}
 
 	/**
@@ -111,7 +123,7 @@ public class RecipeTweaker implements Tweaker {
 	public class_2960 getRecipeId(class_1799 output) {
 		String resultName = class_2378.field_11142.method_10221(output.method_7909()).method_12832();
 		triedRecipeCount++;
-		return new class_2960(LibCD.MODID, "tweaked/"+resultName+"-"+triedRecipeCount);
+		return new class_2960(currentNamespace, "tweaked/"+resultName+"-"+triedRecipeCount);
 	}
 
 	/**
@@ -133,8 +145,10 @@ public class RecipeTweaker implements Tweaker {
 	/**
 	 * Register a recipe to the recipe manager.
 	 * @param recipe A constructed recipe.
+	 * @throws RuntimeException if called outside of resource-reload time.
 	 */
 	public void addRecipe(class_1860<?> recipe) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to add recipes via LibCD outside of reload time!");
 		class_3956<?> type = recipe.method_17716();
 		if (!toAdd.containsKey(type)) {
 			toAdd.put(type, new ArrayList<>());
@@ -167,7 +181,7 @@ public class RecipeTweaker implements Tweaker {
 				class_1799[] in = ((IngredientAccessUtils)(Object)RecipeParser.processIngredient(input)).libcd_getStackArray();
 				stacks.addAll(Arrays.asList(in));
 			} catch (TweakerSyntaxException e) {
-				LibCD.logger.error("Could not add stack to ingredient: malformed stack string {}", input);
+				logger.error("Could not add stack to ingredient: malformed stack string %s", input);
 			}
 		}
 		class_1856 ret = RecipeParser.hackStackIngredients(stacks.toArray(new class_1799[]{}));
@@ -175,7 +189,7 @@ public class RecipeTweaker implements Tweaker {
 		return ret;
 	}
 
-	public void addShaped(Object[][] inputs, class_1799 output) {
+	public void addShaped(Object[][] inputs, Object output) {
 		addShaped(inputs, output, "");
 	}
 
@@ -185,18 +199,18 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addShaped(Object[][] inputs, class_1799 output, String group) {
+	public void addShaped(Object[][] inputs, Object output, String group) {
 		try {
 			Object[] processed = RecipeParser.processGrid(inputs);
 			int width = inputs[0].length;
 			int height = inputs.length;
 			addShaped(processed, output, width, height, group);
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing shaped recipe - " + e.getMessage());
+			logger.error("Error parsing 2D array shaped recipe - " + e.getMessage());
 		}
 	}
 
-	public void addShaped(Object[] inputs, class_1799 output, int width, int height) {
+	public void addShaped(Object[] inputs, Object output, int width, int height) {
 		addShaped(inputs, output, width, height, "");
 	}
 
@@ -208,23 +222,24 @@ public class RecipeTweaker implements Tweaker {
 	 * @param height How many columns the recipe needs.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addShaped(Object[] inputs, class_1799 output, int width, int height, String group){
-		class_2960 recipeId = getRecipeId(output);
+	public void addShaped(Object[] inputs, Object output, int width, int height, String group){
 		try {
-			class_2371<class_1856> ingredients = class_2371.method_10211();
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
+			class_2371<class_1856> ingredients = class_2371.method_10213(width * height, class_1856.field_9017);
 			for (int i = 0; i < Math.min(inputs.length, width * height); i++) {
 				Object id = inputs[i];
-				if (id.equals("")) continue;
-				ingredients.add(i, RecipeParser.processIngredient(id));
+				if (id == null || id.equals("") || id.equals("minecraft:air")) continue;
+				ingredients.set(i, RecipeParser.processIngredient(id));
 			}
-			addRecipe(new class_1869(recipeId, group, width, height, ingredients, output));
+			addRecipe(new class_1869(recipeId, group, width, height, ingredients, stack));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing shaped recipe - " + e.getMessage());
+			logger.error("Error parsing 1D array shaped recipe - " + e.getMessage());
 		}
 	}
 
-	public void addShaped(String[] pattern, Map<String, Object> dictionary, class_1799 output) {
-		addShaped(pattern, dictionary, output, "");
+	public void addDictShaped(String[] pattern, Map<String, Object> dictionary, Object output) {
+		addDictShaped(pattern, dictionary, output, "");
 	}
 
 	/**
@@ -234,21 +249,22 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addShaped(String[] pattern, Map<String, Object> dictionary, class_1799 output, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addDictShaped(String[] pattern, Map<String, Object> dictionary, Object output, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			pattern = RecipeParser.processPattern(pattern);
 			Map<String, class_1856> map = RecipeParser.processDictionary(dictionary);
 			int x = pattern[0].length();
 			int y = pattern.length;
 			class_2371<class_1856> ingredients = RecipeParser.getIngredients(pattern, map, x, y);
-			addRecipe(new class_1869(recipeId, group, x, y, ingredients, output));
+			addRecipe(new class_1869(recipeId, group, x, y, ingredients, stack));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing shaped recipe - " + e.getMessage());
+			logger.error("Error parsing dictionary shaped recipe - " + e.getMessage());
 		}
 	}
 
-	public void addShapeless(Object[] inputs, class_1799 output) {
+	public void addShapeless(Object[] inputs, Object output) {
 		addShapeless(inputs, output, "");
 	}
 
@@ -258,22 +274,23 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addShapeless(Object[] inputs, class_1799 output, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addShapeless(Object[] inputs, Object output, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_2371<class_1856> ingredients = class_2371.method_10211();
 			for (int i = 0; i < Math.min(inputs.length, 9); i++) {
 				Object id = inputs[i];
 				if (id.equals("")) continue;
 				ingredients.add(i, RecipeParser.processIngredient(id));
 			}
-			addRecipe(new class_1867(recipeId, group, output, ingredients));
+			addRecipe(new class_1867(recipeId, group, stack, ingredients));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing shapeless recipe - " + e.getMessage());
+			logger.error("Error parsing shapeless recipe - " + e.getMessage());
 		}
 	}
 
-	public void addSmelting(Object input, class_1799 output, int ticks, float xp) {
+	public void addSmelting(Object input, Object output, int ticks, float xp) {
 		addSmelting(input, output, ticks, xp, "");
 	}
 
@@ -285,17 +302,18 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addSmelting(Object input, class_1799 output, int cookTime, float xp, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addSmelting(Object input, Object output, int cookTime, float xp, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_1856 ingredient = RecipeParser.processIngredient(input);
-			addRecipe(new class_3861(recipeId, group, ingredient, output, xp, cookTime));
+			addRecipe(new class_3861(recipeId, group, ingredient, stack, xp, cookTime));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing smelting recipe - " + e.getMessage());
+			logger.error("Error parsing smelting recipe - " + e.getMessage());
 		}
 	}
 
-	public void addBlasting(Object input, class_1799 output, int ticks, float xp) {
+	public void addBlasting(Object input, Object output, int ticks, float xp) {
 		addBlasting(input, output, ticks, xp, "");
 	}
 
@@ -307,17 +325,18 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addBlasting(Object input, class_1799 output, int cookTime, float xp, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addBlasting(Object input, Object output, int cookTime, float xp, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_1856 ingredient = RecipeParser.processIngredient(input);
-			addRecipe(new class_3859(recipeId, group, ingredient, output, xp, cookTime));
+			addRecipe(new class_3859(recipeId, group, ingredient, stack, xp, cookTime));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing blasting recipe - " + e.getMessage());
+			logger.error("Error parsing blasting recipe - " + e.getMessage());
 		}
 	}
 
-	public void addSmoking(Object input, class_1799 output, int ticks, float xp) {
+	public void addSmoking(Object input, Object output, int ticks, float xp) {
 		addSmoking(input, output, ticks, xp, "");
 	}
 
@@ -329,17 +348,18 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addSmoking(Object input, class_1799 output, int cookTime, float xp, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addSmoking(Object input, Object output, int cookTime, float xp, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_1856 ingredient = RecipeParser.processIngredient(input);
-			addRecipe(new class_3862(recipeId, group, ingredient, output, xp, cookTime));
+			addRecipe(new class_3862(recipeId, group, ingredient, stack, xp, cookTime));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing smokig recipe - " + e.getMessage());
+			logger.error("Error parsing smokig recipe - " + e.getMessage());
 		}
 	}
 
-	public void addCampfire(Object input, class_1799 output, int ticks, float xp) {
+	public void addCampfire(Object input, Object output, int ticks, float xp) {
 		addCampfire(input, output, ticks, xp, "");
 	}
 
@@ -351,17 +371,18 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addCampfire(Object input, class_1799 output, int cookTime, float xp, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addCampfire(Object input, Object output, int cookTime, float xp, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_1856 ingredient = RecipeParser.processIngredient(input);
-			addRecipe(new class_3920(recipeId, group, ingredient, output, xp, cookTime));
+			addRecipe(new class_3920(recipeId, group, ingredient, stack, xp, cookTime));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing campfire recipe - " + e.getMessage());
+			logger.error("Error parsing campfire recipe - " + e.getMessage());
 		}
 	}
 
-	public void addStonecutting(Object input, class_1799 output) {
+	public void addStonecutting(Object input, Object output) {
 		addStonecutting(input, output, "");
 	}
 
@@ -371,13 +392,14 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public void addStonecutting(Object input, class_1799 output, String group) {
-		class_2960 recipeId = getRecipeId(output);
+	public void addStonecutting(Object input, Object output, String group) {
 		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
 			class_1856 ingredient = RecipeParser.processIngredient(input);
-			addRecipe(new class_3975(recipeId, group, ingredient, output));
+			addRecipe(new class_3975(recipeId, group, ingredient, stack));
 		} catch (Exception e) {
-			LibCD.logger.error("Error parsing stonecutter recipe - " + e.getMessage());
+			logger.error("Error parsing stonecutter recipe - " + e.getMessage());
 		}
 	}
 

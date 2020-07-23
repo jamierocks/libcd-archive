@@ -34,7 +34,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring(localPath));
 					TWEAKERS.put(scriptId, script);
 				} catch (IOException e) {
-					LibCD.logger.error("Error when accessing tweaker script {}: {}", fileId.toString(), e.getMessage());
+					LibCD.logger.error("Error when accessing tweaker script %s: %s", fileId.toString(), e.getMessage());
 				}
 			}
 			String subset = LibCD.config.tweaker_subset;
@@ -46,7 +46,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 						String script = IOUtils.toString(res.method_14482());
 						TWEAKERS.put(fileId, script);
 					} catch (IOException e) {
-						LibCD.logger.error("Error when accessing tweaker script {} in subset {}: {}", fileId.toString(), subset, e.getMessage());
+						LibCD.logger.error("Error when accessing tweaker script %s in subset %s: %s", fileId.toString(), subset, e.getMessage());
 					}
 				}
 			}
@@ -76,11 +76,11 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				try {
 					ScriptContext ctx = engine.getContext();
 					for (String name : Tweaker.ASSISTANTS.keySet()) {
-						ctx.setAttribute(name, Tweaker.ASSISTANTS.get(name), ScriptContext.ENGINE_SCOPE);
+						ctx.setAttribute(name, Tweaker.ASSISTANTS.get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
 					}
 					engine.eval(script);
 				} catch (ScriptException e) {
-					LibCD.logger.error("Error executing tweaker script {}: {}", tweaker.toString(), e.getMessage());
+					LibCD.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());
 					continue;
 				}
 				loaded++;
@@ -91,7 +91,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				applied.add(tweaker.getApplyMessage());
 			}
 			String confirm = formatApplied(applied);
-			if (loaded > 0) LibCD.logger.info("Applied {} tweaker {}, including {}", loaded, (loaded == 1? "script" : "scripts"), confirm);
+			if (loaded > 0) LibCD.logger.info("Applied %s tweaker %s, including %s", loaded, (loaded == 1? "script" : "scripts"), confirm);
 		});
 	}
 
