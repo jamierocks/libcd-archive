@@ -1,19 +1,25 @@
 package io.github.cottonmc.libcd.mixin;
 
-import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import net.minecraft.class_1799;
 import net.minecraft.class_1856;
 import net.minecraft.class_2487;
 import net.minecraft.class_2520;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(class_1856.class)
-public class MixinIngredient implements MatchTypeSetter {
+public abstract class MixinIngredient implements IngredientAccessUtils {
+
+	@Shadow private class_1799[] stackArray;
+
+	@Shadow protected abstract void createStackArray();
+
 	private NbtMatchType type = NbtMatchType.NONE;
 	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkStackNbt(class_1799 test, CallbackInfoReturnable<Boolean> cir, class_1799[] stackArray, int arrayLength, int i, class_1799 testAgainst) {
@@ -55,5 +61,11 @@ public class MixinIngredient implements MatchTypeSetter {
 	@Override
 	public void libcd_setMatchType(NbtMatchType type) {
 		this.type = type;
+	}
+
+	@Override
+	public class_1799[] libcd_getStackArray() {
+		createStackArray();
+		return stackArray;
 	}
 }

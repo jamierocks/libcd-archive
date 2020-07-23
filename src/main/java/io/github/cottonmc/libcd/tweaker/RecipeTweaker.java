@@ -2,7 +2,7 @@ package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.util.NbtMatchType;
@@ -161,14 +161,14 @@ public class RecipeTweaker implements Tweaker {
 		NbtMatchType match = NbtMatchType.forName(nbtMatch);
 		for (String input : inputs) {
 			try {
-				class_1799[] in = RecipeParser.processIngredient(input).method_8105();
+				class_1799[] in = ((IngredientAccessUtils)(Object)RecipeParser.processIngredient(input)).libcd_getStackArray();
 				stacks.addAll(Arrays.asList(in));
 			} catch (TweakerSyntaxException e) {
 				LibCD.logger.error("Could not add stack to ingredient: malformed stack string {}", input);
 			}
 		}
 		class_1856 ret = RecipeParser.hackStackIngredients(stacks.toArray(new class_1799[]{}));
-		((MatchTypeSetter)(Object)ret).libcd_setMatchType(match);
+		((IngredientAccessUtils)(Object)ret).libcd_setMatchType(match);
 		return ret;
 	}
 

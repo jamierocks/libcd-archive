@@ -1,7 +1,7 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
-import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
 import java.util.*;
@@ -66,7 +66,7 @@ public class RecipeParser {
 				}
 			}
 			class_1856 ret = hackStackIngredients(stacks.toArray(new class_1799[]{}));
-			((MatchTypeSetter)(Object)ret).libcd_setMatchType(type);
+			((IngredientAccessUtils)(Object)ret).libcd_setMatchType(type);
 			return ret;
 		}
 		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass());

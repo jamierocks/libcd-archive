@@ -3,6 +3,8 @@ package io.github.cottonmc.libcd.tweaker;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.util.StackInfo;
+import io.github.cottonmc.libcd.util.nbt.WrappedCompoundTag;
 import net.minecraft.class_1299;
 import net.minecraft.class_1792;
 import net.minecraft.class_1799;
@@ -138,6 +140,33 @@ public class TweakerUtils {
 	}
 
 	/**
+	 * Add NBT to an item stack.
+	 * @param stack The stack to add NBT to.
+	 * @param tag The wrapped compound tag to add.
+	 * @return The stack with added NBT.
+	 */
+	public class_1799 addNbtToStack(class_1799 stack, WrappedCompoundTag tag) {
+		stack.method_7980(tag.getUnderlying());
+		return stack;
+	}
+
+	/**
+	 * @param stack The stack to get info for.
+	 * @return A wrapper class with read-only info about the tag.
+	 */
+	public StackInfo getStackInfo(class_1799 stack) {
+		return new StackInfo(stack);
+	}
+
+	/**
+	 * @param stack The stack to get the tag for.
+	 * @return A wrapper around the mutable tag for the stack.
+	 */
+	public WrappedCompoundTag getStackTag(class_1799 stack) {
+		return new WrappedCompoundTag(stack.method_7948());
+	}
+
+	/**
 	 * Add an enchantment to an ItemStack. Will ignore whether the enchantment fits on the stack.
 	 * @param stack The stack to enchant.
 	 * @param enchantment The ID of the enchantment to add.
@@ -230,9 +259,5 @@ public class TweakerUtils {
 			res[i] = class_2378.field_11142.method_10221((class_1792)items[i]).toString();
 		}
 		return res;
-	}
-
-	public StackInfo getStackInfo(class_1799 stack) {
-		return new StackInfo(stack);
 	}
 }
