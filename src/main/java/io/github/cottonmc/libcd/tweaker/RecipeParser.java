@@ -1,11 +1,10 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
-import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import net.minecraft.class_1792;
 import net.minecraft.class_1799;
 import net.minecraft.class_1802;
@@ -26,26 +25,51 @@ public class RecipeParser {
 	 * @param input The id to use, with a # at the front if it's a tag or -> between two ids for a getter
 	 * @return the Ingredient for the given id
 	 */
-	public static class_1856 processIngredient(String input) throws TweakerSyntaxException {
-		if (input.indexOf('#') == 0) {
-			String tag = input.substring(1);
-			class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
-			if (itemTag == null) throw new TweakerSyntaxException("Failed to get item tag for input: " + input);
-			return class_1856.method_8106(itemTag);
-		} else if (input.indexOf('&') == 0) {
-			LibCD.logger.warn("Use of deprecated potion-getting method in '" + input + "', this will be removed soon!");
-			class_1799 stack = TweakerUtils.getPotion(input.substring(1));
-			if (stack.method_7960()) throw new TweakerSyntaxException("Failed to get potion for input: " + input);
-			return hackStackIngredients(stack);
-		} else if (input.contains("->")) {
-			class_1799 stack = TweakerUtils.getSpecialStack(input);
-			if (stack.method_7960()) throw new TweakerSyntaxException("Failed to get special stack for input: " + input);
-			return hackStackIngredients(stack);
-		} else {
-			class_1792 item = TweakerUtils.getItem(input);
-			if (item == class_1802.field_8162) throw new TweakerSyntaxException("Failed to get item for input: " + input);
-			return class_1856.method_8091(item);
+	public static class_1856 processIngredient(Object input) throws TweakerSyntaxException {
+		if (input instanceof class_1856) return (class_1856)input;
+		else if (input instanceof String) {
+			String in = (String)input;
+			int index = in.indexOf('{');
+			String nbt = "";
+			NbtMatchType type = NbtMatchType.NONE;
+			List<class_1799> stacks = new ArrayList<>();
+			if (index != -1) {
+				int andIndex = in.indexOf('&');
+				if (andIndex != -1) {
+					type = NbtMatchType.forName(in.substring(andIndex+1));
+					in = in.substring(0, andIndex);
+				}
+				nbt = in.substring(index);
+				in = in.substring(0, index);
+			}
+			if (in.indexOf('#') == 0) {
+				String tag = in.substring(1);
+				class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
+				if (itemTag == null) throw new TweakerSyntaxException("Failed to get item tag for input: " + in);
+				for (class_1792 item : itemTag.method_15138()) {
+					stacks.add(new class_1799(item));
+				}
+			} else if (in.contains("->")) {
+				class_1799 stack = TweakerUtils.INSTANCE.getSpecialStack(in);
+				if (stack.method_7960())
+					throw new TweakerSyntaxException("Failed to get special stack for input: " + in);
+				stacks.add(stack);
+				type = NbtMatchType.EXACT;
+			} else {
+				class_1792 item = TweakerUtils.INSTANCE.getItem(in);
+				if (item == class_1802.field_8162) throw new TweakerSyntaxException("Failed to get item for input: " + in);
+				stacks.add(new class_1799(item));
+			}
+			if (!nbt.equals("")) {
+				for (class_1799 stack : stacks) {
+					if (!stack.method_7985() || stack.method_7969().isEmpty()) TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
+				}
+			}
+			class_1856 ret = hackStackIngredients(stacks.toArray(new class_1799[]{}));
+			((MatchTypeSetter)(Object)ret).libcd_setMatchType(type);
+			return ret;
 		}
+		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass());
 	}
 
 	/**
@@ -66,13 +90,13 @@ public class RecipeParser {
 	 * @param inputs The array of string arrays to process inputs from
 	 * @return The inputs converted into a single string array if the grid is valid
 	 */
-	public static String[] processGrid(String[][] inputs) throws TweakerSyntaxException {
+	public static Object[] processGrid(Object[][] inputs) throws TweakerSyntaxException {
 		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 		if (inputs.length == 0) throw new TweakerSyntaxException("Invalid pattern: empty pattern is not allowed");
 		int width = inputs[0].length;
-		String[] output = new String[inputs.length * inputs[0].length];
+		Object[] output = new Object[inputs.length * inputs[0].length];
 		for (int i = 0; i < inputs.length; i++) {
-			String[] row = inputs[i];
+			Object[] row = inputs[i];
 			if (row.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 			if (row.length != width) throw new TweakerSyntaxException("Invalid pattern: each row must be the same width");
 			for (int j = 0; j < width; j++) {
@@ -145,9 +169,9 @@ public class RecipeParser {
 	 * @param dictionary a map of keys to values for a recipe to parse.
 	 * @return A map of string keys to ingredient values that a Recipe can read.
 	 */
-	public static Map<String, class_1856> processDictionary(Map<String, String> dictionary) throws TweakerSyntaxException {
+	public static Map<String, class_1856> processDictionary(Map<String, Object> dictionary) throws TweakerSyntaxException {
 		Map<String, class_1856> map = new HashMap<>();
-		for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+		for (Map.Entry<String, Object> entry : dictionary.entrySet()) {
 			if (entry.getKey().length() != 1) {
 				throw new TweakerSyntaxException("Invalid key entry: '" + entry.getKey() + "' is an invalid symbol (must be 1 character only).");
 			}
@@ -226,9 +250,9 @@ public class RecipeParser {
 	 */
 	public static class_1856 hackStackIngredients(class_1799...stacks) {
 		class_2540 buf = new class_2540(Unpooled.buffer());
-		buf.writeInt(stacks.length);
-		for (int i = 0; i < stacks.length; i++) {
-			buf.method_10793(stacks[i]);
+		buf.method_10804(stacks.length);
+		for (class_1799 stack : stacks) {
+			buf.method_10793(stack);
 		}
 		return class_1856.method_8086(buf);
 	}

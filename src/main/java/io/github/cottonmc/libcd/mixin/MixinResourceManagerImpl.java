@@ -36,7 +36,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 
 	@Shadow @Final private List<class_3302> listeners;
 
-	@Shadow public abstract List<class_3298> method_14489(class_2960 identifier_1) throws IOException;
+	@Shadow public abstract List<class_3298> method_14489(class_2960 id) throws IOException;
 
 	@Shadow @Final private Map<String, class_3294> namespaceManagers;
 

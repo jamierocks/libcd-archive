@@ -8,6 +8,7 @@ import net.minecraft.class_3300;
 import net.minecraft.class_3695;
 import org.apache.commons.io.IOUtils;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -43,9 +44,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					try {
 						class_3298 res = manager.method_14486(fileId);
 						String script = IOUtils.toString(res.method_14482());
-						int localPath = fileId.method_12832().indexOf('/')+1;
-						class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring(localPath));
-						TWEAKERS.put(scriptId, script);
+						TWEAKERS.put(fileId, script);
 					} catch (IOException e) {
 						LibCD.logger.error("Error when accessing tweaker script {} in subset {}: {}", fileId.toString(), subset, e.getMessage());
 					}
@@ -75,6 +74,10 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					continue;
 				}
 				try {
+					ScriptContext ctx = engine.getContext();
+					for (String name : Tweaker.ASSISTANTS.keySet()) {
+						ctx.setAttribute(name, Tweaker.ASSISTANTS.get(name), ScriptContext.ENGINE_SCOPE);
+					}
 					engine.eval(script);
 				} catch (ScriptException e) {
 					LibCD.logger.error("Error executing tweaker script {}: {}", tweaker.toString(), e.getMessage());
@@ -108,6 +111,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 
 	@Override
 	public class_2960 getFabricId() {
-		return new class_2960(LibCD.MODID, "tweak_loader");
+		return new class_2960(LibCD.MODID, "tweaker_loader");
 	}
+
 }
