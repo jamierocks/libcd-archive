@@ -91,7 +91,7 @@ public class RecipeParser {
 				count = Integer.parseInt(in.substring(atIndex + 1));
 				in = in.substring(0, atIndex);
 			}
-			if (in.contains("->")) {
+			if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
 				class_1799 stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.method_7960())
 					throw new CDSyntaxError("Failed to get special stack for input: " + in);

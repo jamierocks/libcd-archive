@@ -1,7 +1,9 @@
 package io.github.cottonmc.libcd.loader;
 
+import blue.endless.jankson.JsonArray;
+import blue.endless.jankson.JsonObject;
+import blue.endless.jankson.JsonPrimitive;
 import io.github.cottonmc.libcd.api.CDCommons;
-import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.LibCD;
@@ -13,89 +15,75 @@ import net.minecraft.class_3300;
 import net.minecraft.class_3695;
 import org.apache.commons.io.IOUtils;
 
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class TweakerLoader implements SimpleResourceReloadListener {
-	public static Map<class_2960, String> TWEAKERS = new HashMap<>();
+public class TweakerLoader implements SimpleResourceReloadListener<Map<class_2960, ScriptBridge>> {
+	public static Map<class_2960, ScriptBridge> SCRIPTS = new HashMap<>();
 	public static final ScriptEngineManager SCRIPT_MANAGER = new ScriptEngineManager();
 
 	@Override
 	public CompletableFuture load(class_3300 manager, class_3695 profiler, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
-			TWEAKERS.clear();
+			SCRIPTS.clear();
 			Collection<class_2960> resources = manager.method_14488("tweakers", name -> true);
 			for (class_2960 fileId : resources) {
+				int localPath = fileId.method_12832().indexOf('/')+1;
+				class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring(localPath));
 				try {
 					class_3298 res = manager.method_14486(fileId);
 					String script = IOUtils.toString(res.method_14482(), StandardCharsets.UTF_8);
-					int localPath = fileId.method_12832().indexOf('/')+1;
-					class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring(localPath));
-					TWEAKERS.put(scriptId, script);
+					String extension = scriptId.method_12832().substring(scriptId.method_12832().lastIndexOf('.') + 1);
+					ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
+					if (engine == null) {
+						CDCommons.logger.error("Engine for tweaker script not found: " + scriptId.toString());
+						continue;
+					}
+					SCRIPTS.put(scriptId, new ScriptBridge(engine, script, scriptId));
 				} catch (IOException e) {
-					CDCommons.logger.error("Error when accessing tweaker script %s: %s", fileId.toString(), e.getMessage());
+					CDCommons.logger.error("Error when accessing tweaker script %s: %s", scriptId.toString(), e.getMessage());
 				}
 			}
 			String subset = LibCD.config.tweaker_subset;
 			if (!subset.equals("")) {
 				Collection<class_2960> setResources = manager.method_14488("tweakers_"+subset, name -> true);
 				for (class_2960 fileId : setResources) {
+					class_2960 scriptId = new class_2960(fileId.method_12836(), fileId.method_12832().substring("tweakers_".length()));
 					try {
 						class_3298 res = manager.method_14486(fileId);
 						String script = IOUtils.toString(res.method_14482(), StandardCharsets.UTF_8);
-						TWEAKERS.put(fileId, script);
+						String extension = scriptId.method_12832().substring(scriptId.method_12832().lastIndexOf('.') + 1);
+						ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
+						if (engine == null) {
+							CDCommons.logger.error("Engine for tweaker script not found: " + scriptId.toString());
+							continue;
+						}
+						SCRIPTS.put(scriptId, new ScriptBridge(engine, script, scriptId));
 					} catch (IOException e) {
-						CDCommons.logger.error("Error when accessing tweaker script %s in subset %s: %s", fileId.toString(), subset, e.getMessage());
+						CDCommons.logger.error("Error when accessing tweaker script %s (in subset %s): %s", scriptId.toString(), subset, e.getMessage());
 					}
 				}
 			}
-			return TWEAKERS;
+			return SCRIPTS;
 		});
 	}
 
 	@Override
-	public CompletableFuture<Void> apply(Object o, class_3300 manager, class_3695 profiler, Executor executor) {
+	public CompletableFuture<Void> apply(Map<class_2960, ScriptBridge> scripts, class_3300 manager, class_3695 profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
 			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
 				tweaker.prepareReload(manager);
 			}
 			int loaded = 0;
-			for (class_2960 tweaker : TWEAKERS.keySet()) {
-				String extension = tweaker.method_12832().substring(tweaker.method_12832().lastIndexOf('.') + 1);
-				String script = TWEAKERS.get(tweaker);
-				if (script == null) {
-					CDCommons.logger.error("Tweaker script not found: " + tweaker.toString());
-					continue;
-				}
-				ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
-				if (engine == null) {
-					CDCommons.logger.error("Engine for tweaker script not found: " + tweaker.toString());
-					continue;
-				}
-				try {
-					if (!script.contains("libcd.require")) {
-						CDCommons.logger.warn("WARNING! Script %s doesn't use the new `libcd.require` system! It will break in a future update!", tweaker.toString());
-					}
-					ScriptContext ctx = engine.getContext();
-					ScriptBridge bridge = new ScriptBridge(engine, script, tweaker);
-					for (String name : TweakerManager.INSTANCE.getLegacyAssistants().keySet()) {
-						ctx.setAttribute(name, TweakerManager.INSTANCE.getLegacyAssistants().get(name).apply(bridge), ScriptContext.ENGINE_SCOPE);
-					}
-					ctx.setAttribute("libcd", bridge, ScriptContext.ENGINE_SCOPE);
-					ctx.setAttribute("log", new CDLogger(tweaker.method_12836()), ScriptContext.ENGINE_SCOPE);
-					engine.eval(script);
-				} catch (ScriptException e) {
-					CDCommons.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());
-					continue;
-				}
-				loaded++;
+			for (class_2960 id : SCRIPTS.keySet()) {
+				ScriptBridge script = SCRIPTS.get(id);
+				if (!script.hasRun()) script.run();
+				if (!script.hasErrored()) loaded++;
 			}
 			List<String> applied = new ArrayList<>();
 			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
@@ -119,6 +107,23 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 			if (i == messages.size() - 2) ret.append("and ");
 		}
 		return ret.toString();
+	}
+
+	public static JsonObject getDebugObject() {
+		JsonObject ret = new JsonObject();
+		JsonArray successful = new JsonArray();
+		JsonArray errored = new JsonArray();
+		for (class_2960 id : SCRIPTS.keySet()) {
+			ScriptBridge bridge = SCRIPTS.get(id);
+			if (bridge.hasErrored()) {
+				errored.add(new JsonPrimitive(id.toString()));
+			} else {
+				successful.add(new JsonPrimitive(id.toString()));
+			}
+		}
+		ret.put("successful", successful);
+		ret.put("errored", errored);
+		return ret;
 	}
 
 	@Override

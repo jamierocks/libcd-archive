@@ -32,7 +32,7 @@ public class LibCD implements ModInitializer {
 	public static CDConfig config;
 
 	public static boolean isDevMode() {
-		return FabricLoader.getInstance().isDevelopmentEnvironment() || config.dev_mode;
+		return config.dev_mode;
 	}
 
 	@Override
@@ -88,7 +88,6 @@ public class LibCD implements ModInitializer {
 			debugNode.addChild(debugExportNode);
 			libcdNode.addChild(debugNode);
 			dispatcher.getRoot().addChild(libcdNode);
-			
 		});
 	}
 
@@ -114,6 +113,7 @@ public class LibCD implements ModInitializer {
 					saveConfig(result);
 				}
 			}
+			return result;
 		} catch (Exception e) {
 			CDCommons.logger.error("Error loading config: {}", e.getMessage());
 		}

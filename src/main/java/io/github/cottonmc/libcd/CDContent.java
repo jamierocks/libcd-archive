@@ -24,6 +24,7 @@ import net.minecraft.class_1844;
 import net.minecraft.class_1847;
 import net.minecraft.class_2378;
 import net.minecraft.class_2960;
+import net.minecraft.class_3489;
 import java.util.List;
 
 public class CDContent implements LibCDInitializer {
@@ -44,7 +45,7 @@ public class CDContent implements LibCDInitializer {
 
 	@Override
 	public void initConditions(ConditionManager manager) {
-		manager.registerCondition(new class_2960(CDCommons.MODID, "mod_loaded"), (value) -> {
+		manager.registerCondition(new class_2960(CDCommons.MODID, "mod_loaded"), value -> {
 			if (value instanceof String) return FabricLoader.getInstance().isModLoaded((String) value);
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
@@ -58,21 +59,35 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("mod_loaded must accept either a String or an Array!");
 		});
-		manager.registerCondition(new class_2960(CDCommons.MODID, "item_exists"), (value) -> {
+		manager.registerCondition(new class_2960(CDCommons.MODID, "item_exists"), value -> {
 			if (value instanceof String) return class_2378.field_11142.method_10223(new class_2960((String)value)) != class_1802.field_8162;
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
-					if (!(el instanceof JsonPrimitive)) return false;
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						if (class_2378.field_11142.method_10223(new class_2960((String)obj)) == class_1802.field_8162) return false;
-					}  else return false;
+					}  else throw new CDSyntaxError("item_exists array must only contain Strings!");
 				}
 				return true;
 			}
 			throw new CDSyntaxError("item_exists must accept either a String or an Array!");
 		});
-		manager.registerCondition(new class_2960(CDCommons.MODID, "not"), (value) -> {
+		manager.registerCondition(new class_2960(CDCommons.MODID, "item_tag_exists"), value -> {
+			if (value instanceof String) return class_3489.method_15106().method_15189().contains(new class_2960((String)value));
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!class_3489.method_15106().method_15189().contains(new class_2960((String)value))) return false;
+					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("item_tag_exists must accept either a String or an Array!");
+		});
+		manager.registerCondition(new class_2960(CDCommons.MODID, "not"), value -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
 				for (String key : json.keySet()) {
@@ -85,7 +100,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("not must accept an Object!");
 		});
-		manager.registerCondition(new class_2960(CDCommons.MODID, "or"), (value) -> {
+		manager.registerCondition(new class_2960(CDCommons.MODID, "or"), value -> {
 			if (value instanceof JsonArray) {
 				JsonArray json = (JsonArray) value;
 				for (JsonElement elem : json) {
