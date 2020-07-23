@@ -403,4 +403,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
+	public TweakerLogger getLogger() {
+		return logger;
+	}
 }
