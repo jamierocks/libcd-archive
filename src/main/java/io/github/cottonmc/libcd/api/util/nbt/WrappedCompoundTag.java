@@ -236,7 +236,7 @@ public class WrappedCompoundTag {
 	/**
 	 * Get an array of bytes in the tag.
 	 * @param key The key to get from.
-	 * @return The value of the byte array tag with this key, or [0].
+	 * @return The value of the byte array tag with this key, or [].
 	 */
 	public byte[] getByteArray(String key) {
 		return underlying.method_10547(key);
@@ -334,7 +334,7 @@ public class WrappedCompoundTag {
 	/**
 	 * Get an int array in the tag.
 	 * @param key The key to get from.
-	 * @return The value of the int array tag with this key, or [0].
+	 * @return The value of the int array tag with this key, or [].
 	 */
 	public int[] getIntArray(String key) {
 		return underlying.method_10561(key);
@@ -352,7 +352,7 @@ public class WrappedCompoundTag {
 	/**
 	 * Get an array of longs in the tag.
 	 * @param key The key to get from.
-	 * @return The value of the long array tag with this key, or [0].
+	 * @return The value of the long array tag with this key, or [].
 	 */
 	public long[] getLongArray(String key) {
 		return underlying.method_10565(key);

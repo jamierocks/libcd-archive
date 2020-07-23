@@ -10,6 +10,8 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import net.minecraft.class_2960;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A bridge for specific LibCD hooks between Java and JSR-223 languages. An instance is provided to every script as `libcd`.
@@ -21,6 +23,7 @@ public class ScriptBridge {
 	private class_2960 id;
 	private boolean hasRun = false;
 	private boolean hasErrored = false;
+	private List<Tweaker> requiredTweakers = new ArrayList<>();
 
 	public ScriptBridge(ScriptEngine engine, String scriptText, class_2960 id) {
 		this.engine = engine;
@@ -34,7 +37,12 @@ public class ScriptBridge {
 	 * @return The assistant object with the given name, prepared for this script.
 	 */
 	public Object require(String assistant) {
-		return TweakerManager.INSTANCE.getAssistant(assistant, this);
+		Object ret = TweakerManager.INSTANCE.getAssistant(assistant, this);
+		//if it's a tweaker, note that so we can re-prep if `importScript` gets run
+		if (ret instanceof Tweaker) {
+			requiredTweakers.add((Tweaker)ret);
+		}
+		return ret;
 	}
 
 	/**
@@ -51,6 +59,10 @@ public class ScriptBridge {
 		}
 		ScriptBridge bridge = TweakerLoader.SCRIPTS.get(id);
 		if (!bridge.hasRun()) bridge.run();
+		//now that the other script has run, re-prep any tweakers we've required before, since the other script mighta messed them up
+		for (Tweaker tweaker : requiredTweakers) {
+			tweaker.prepareFor(this);
+		}
 		return bridge;
 	}
 
