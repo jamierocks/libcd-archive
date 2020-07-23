@@ -3,16 +3,20 @@ package io.github.cottonmc.libcd.api.tweaker.loot;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
-import java.util.ArrayList;
-import java.util.List;
+import io.github.cottonmc.libcd.api.util.nbt.WrappedCompoundTag;
 import net.minecraft.class_117;
 import net.minecraft.class_141;
+import net.minecraft.class_159;
 import net.minecraft.class_3668;
 import net.minecraft.class_40;
 import net.minecraft.class_44;
 import net.minecraft.class_4570;
 import net.minecraft.class_47;
 import net.minecraft.class_61;
+import net.minecraft.loot.function.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A utility class to assemble loot functions from JSR-223 code.
@@ -20,6 +24,8 @@ import net.minecraft.class_61;
 public class Functions {
 	public static final Functions INSTANCE = new Functions();
 	private JsonParser parser = new JsonParser();
+
+	private Functions() {}
 
 	/**
 	 * Parse Stringified JSON into a special loot function. Useful for complex or third-party functions.
@@ -81,5 +87,15 @@ public class Functions {
 		}
 		class_47.class_50 target = class_47.class_50.method_314(from);
 		return new class_3668(safeConditions.toArray(new class_4570[]{}), target);
+	}
+
+	//TODO: somehow able to pass conditions?
+	/**
+	 * Set the NBT for a stack in a loot table
+	 * @param tag The wrapped form of the compound tag to set.
+	 * @return An assembled function, ready to add to a table or entry.
+	 */
+	public class_117 setNbt(WrappedCompoundTag tag) {
+		return class_159.method_677(tag.getUnderlying()).method_515();
 	}
 }

@@ -14,6 +14,7 @@ import io.github.cottonmc.libcd.api.tweaker.loot.Conditions;
 import io.github.cottonmc.libcd.api.tweaker.loot.Entries;
 import io.github.cottonmc.libcd.api.tweaker.loot.Functions;
 import io.github.cottonmc.libcd.api.tweaker.loot.LootTweaker;
+import io.github.cottonmc.libcd.api.tweaker.util.Nbt;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,8 +23,10 @@ import net.minecraft.class_1802;
 import net.minecraft.class_1842;
 import net.minecraft.class_1844;
 import net.minecraft.class_1847;
+import net.minecraft.class_2246;
 import net.minecraft.class_2378;
 import net.minecraft.class_2960;
+import net.minecraft.class_3481;
 import net.minecraft.class_3489;
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class CDContent implements LibCDInitializer {
 		manager.addTweaker("libcd.recipe.RecipeTweaker", RecipeTweaker.INSTANCE);
 		manager.addTweaker("libcd.loot.LootTweaker", LootTweaker.INSTANCE);
 		manager.addAssistant("libcd.util.TweakerUtils", TweakerUtils.INSTANCE);
+		manager.addAssistant("libcd.util.Nbt", Nbt.INSTANCE);
 		manager.addAssistant("libcd.loot.Conditions", Conditions.INSTANCE);
 		manager.addAssistant("libcd.loot.Functions", Functions.INSTANCE);
 		manager.addAssistant("libcd.loot.Entries", Entries.INSTANCE);
@@ -87,6 +91,34 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("item_tag_exists must accept either a String or an Array!");
 		});
+		manager.registerCondition(new class_2960(CDCommons.MODID, "block_exists"), value -> {
+			if (value instanceof String) return class_2378.field_11146.method_10223(new class_2960((String)value)) != class_2246.field_10124;
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (class_2378.field_11146.method_10223(new class_2960((String)obj)) == class_2246.field_10124) return false;
+					}  else throw new CDSyntaxError("block_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_exists must accept either a String or an Array!");
+		});
+		manager.registerCondition(new class_2960(CDCommons.MODID, "block_tag_exists"), value -> {
+			if (value instanceof String) return class_3481.method_15073().method_15189().contains(new class_2960((String)value));
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!class_3481.method_15073().method_15189().contains(new class_2960((String)value))) return false;
+					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_tag_exists must accept either a String or an Array!");
+		});
 		manager.registerCondition(new class_2960(CDCommons.MODID, "not"), value -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
@@ -99,6 +131,21 @@ public class CDContent implements LibCDInitializer {
 				}
 			}
 			throw new CDSyntaxError("not must accept an Object!");
+		});
+		manager.registerCondition(new class_2960(CDCommons.MODID, "none"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new class_2960(key), ConditionalData.parseElement(obj.get(key)))) return false;
+						}
+					}
+				}
+				return true;
+			}
+			throw new CDSyntaxError("none must accept an Array!");
 		});
 		manager.registerCondition(new class_2960(CDCommons.MODID, "or"), value -> {
 			if (value instanceof JsonArray) {
@@ -113,6 +160,25 @@ public class CDContent implements LibCDInitializer {
 				}
 			}
 			throw new CDSyntaxError("or must accept an Array!");
+		});
+		manager.registerCondition(new class_2960(CDCommons.MODID, "xor"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				boolean ret = false;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new class_2960(key), ConditionalData.parseElement(obj.get(key)))) {
+								if(ret) return false;
+								else ret = true;
+							}
+						}
+					}
+				}
+				return ret;
+			}
+			throw new CDSyntaxError("xor must accept an Array!");
 		});
 		manager.registerCondition(new class_2960(CDCommons.MODID, "dev_mode"), value -> {
 			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();

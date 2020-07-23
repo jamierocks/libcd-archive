@@ -1,8 +1,8 @@
 package io.github.cottonmc.libcd.mixin;
 
-import io.github.cottonmc.libcd.LibCD;
+import com.google.common.base.Charsets;
 import io.github.cottonmc.libcd.api.CDCommons;
-import io.github.cottonmc.libcd.condition.ConditionalData;
+import io.github.cottonmc.libcd.api.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.impl.ResourceSearcher;
 import net.minecraft.class_2960;
@@ -23,10 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Mixin(class_3304.class)
@@ -39,7 +36,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 	@Shadow @Final private Map<String, class_3294> namespaceManagers;
 
 	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable cir,
+	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable<Collection<class_2960>> cir,
 										Set<class_2960> foundResources, List<class_2960> sortedResources) {
 		List<class_2960> sortedCopy = new ArrayList<>(sortedResources);
 		for (class_2960 id : sortedCopy) {
@@ -49,7 +46,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 			if (libcd$contains(metaId)) {
 				try {
 					class_3298 meta = method_14486(metaId);
-					String metaText = IOUtils.toString(meta.method_14482());
+					String metaText = IOUtils.toString(meta.method_14482(), Charsets.UTF_8);
 					if (!ConditionalData.shouldLoad(id, metaText)) {
 						sortedResources.remove(id);
 					}

@@ -28,6 +28,8 @@ public class LootTweaker implements Tweaker {
 	private CDLogger logger;
 	private JsonObject tableDebug;
 
+	private LootTweaker() {}
+
 	@Override
 	public void prepareReload(class_3300 manager) {
 		tableDebug = new JsonObject();

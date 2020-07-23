@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
-import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
+import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_1792;
@@ -36,6 +36,8 @@ public class RecipeParser {
 	 */
 	public static class_1856 processIngredient(Object input) throws CDSyntaxError {
 		if (input instanceof class_1856) return (class_1856)input;
+		else if (input instanceof class_1799) return hackStackIngredients((class_1799)input);
+		else if (input instanceof class_1799[]) return hackStackIngredients((class_1799[])input);
 		else if (input instanceof String) {
 			String in = (String)input;
 			int index = in.indexOf('{');
@@ -308,8 +310,9 @@ public class RecipeParser {
 	/**
 	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
 	 * so I have to write this ugly, terrible hack to make it work!
-	 * Serializes the input stacks into a PacketByteBuf (or JSON if NBT Crafting is here to deal with NBT),
+	 * Serializes the input stacks into a PacketByteBuf,
 	 * then tricks the Ingredient class into deserializing them.
+	 * However, if NBT Crafting is here, I can just do it with that!
 	 * @param stacks The input stacks to support.
 	 * @return The ingredient object for the input stacks.
 	 */
@@ -324,6 +327,7 @@ public class RecipeParser {
 			} else {
 				return class_1856.method_8102(serializeStack(stacks[0]));
 			}
+//			return IngredientAssembler.constructFromStacks(stacks);
 		} else {
 			class_2540 buf = new class_2540(Unpooled.buffer());
 			buf.method_10804(stacks.length);
@@ -334,6 +338,9 @@ public class RecipeParser {
 		}
 	}
 
+	/*
+	 * Helpful if the NBT Crafting `constructFromStacks` doesn't work. It doesn't currently, so here it is.
+	 */
 	private static JsonObject serializeStack(class_1799 stack) {
 		JsonObject ret = new JsonObject();
 		ret.addProperty("item", class_2378.field_11142.method_10221(stack.method_7909()).toString());
