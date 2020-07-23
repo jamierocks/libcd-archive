@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "libcd",
-  "version": "2.2.2+1.15.2",
+  "version": "2.3.0+20w06a",
 
   "name": "LibCapableData",
   "icon": "assets/libcd/icon.png",

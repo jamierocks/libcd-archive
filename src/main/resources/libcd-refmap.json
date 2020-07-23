@@ -11,12 +11,19 @@
       "net.minecraft.recipe.CookingRecipeSerializer$RecipeFactory": "net/minecraft/class_3957$class_3958",
       "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;FI)Lnet/minecraft/class_1874;"
     },
+    "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
+      "deserialize": "Lnet/minecraft/class_170$class_172;method_754(Lcom/google/gson/JsonElement;Ljava/lang/reflect/Type;Lcom/google/gson/JsonDeserializationContext;)Lnet/minecraft/class_170;"
+    },
     "io/github/cottonmc/libcd/mixin/MixinIngredient": {
       "test": "Lnet/minecraft/class_1856;method_8093(Lnet/minecraft/class_1799;)Z"
     },
     "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer": {
       "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;": "Lnet/minecraft/class_3518;method_15265(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;",
       "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;": "Lnet/minecraft/class_3972$class_3973;method_17881(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_3972;"
+    },
+    "io/github/cottonmc/libcd/mixin/MixinAdvancementRewards": {
+      "toJson": "Lnet/minecraft/class_170;method_747()Lcom/google/gson/JsonElement;",
+      "apply": "Lnet/minecraft/class_170;method_748(Lnet/minecraft/class_3222;)V"
     },
     "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer$MixinCuttingRecipeFactory": {
       "net.minecraft.recipe.CuttingRecipe$Serializer$RecipeFactory": "net/minecraft/class_3972$class_3973$class_3974",
@@ -40,12 +47,19 @@
         "net.minecraft.recipe.CookingRecipeSerializer$RecipeFactory": "net/minecraft/class_3957$class_3958",
         "create": "create(Lnet/minecraft/class_2960;Ljava/lang/String;Lnet/minecraft/class_1856;Lnet/minecraft/class_1799;FI)Lnet/minecraft/class_1874;"
       },
+      "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
+        "deserialize": "Lnet/minecraft/class_170$class_172;method_754(Lcom/google/gson/JsonElement;Ljava/lang/reflect/Type;Lcom/google/gson/JsonDeserializationContext;)Lnet/minecraft/class_170;"
+      },
       "io/github/cottonmc/libcd/mixin/MixinIngredient": {
         "test": "Lnet/minecraft/class_1856;method_8093(Lnet/minecraft/class_1799;)Z"
       },
       "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer": {
         "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;": "Lnet/minecraft/class_3518;method_15265(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;",
         "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/CuttingRecipe;": "Lnet/minecraft/class_3972$class_3973;method_17881(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_3972;"
+      },
+      "io/github/cottonmc/libcd/mixin/MixinAdvancementRewards": {
+        "toJson": "Lnet/minecraft/class_170;method_747()Lcom/google/gson/JsonElement;",
+        "apply": "Lnet/minecraft/class_170;method_748(Lnet/minecraft/class_3222;)V"
       },
       "io/github/cottonmc/libcd/mixin/MixinCuttingRecipeSerializer$MixinCuttingRecipeFactory": {
         "net.minecraft.recipe.CuttingRecipe$Serializer$RecipeFactory": "net/minecraft/class_3972$class_3973$class_3974",
