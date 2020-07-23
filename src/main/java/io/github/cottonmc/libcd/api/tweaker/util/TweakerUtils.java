@@ -24,9 +24,9 @@ import net.minecraft.class_2522;
 import net.minecraft.class_2585;
 import net.minecraft.class_2960;
 import net.minecraft.class_3414;
-import net.minecraft.class_3489;
 import net.minecraft.class_3494;
 import net.minecraft.class_3611;
+import net.minecraft.class_5323;
 
 /**
  * Various utilities for writing tweakers, due to the obfuscation of minecraft code.
@@ -52,7 +52,7 @@ public class TweakerUtils {
 	 */
 	public class_1792 getDefaultItem(String id) {
 		class_2960 tagId = new class_2960(id);
-		class_3494<class_1792> tag = class_3489.method_15106().method_15193(tagId);
+		class_3494<class_1792> tag = class_5323.method_29223().method_29220().method_15193(tagId);
 		if (tag == null) return class_1802.field_8162;
 		return TagHelper.ITEM.getDefaultEntry(tag);
 	}
@@ -288,7 +288,7 @@ public class TweakerUtils {
 	 * @return An array of items in the tag.
 	 */
 	public String[] getItemsInTag(String tagId) {
-		class_3494<class_1792> tag = class_3489.method_15106().method_15193(new class_2960(tagId));
+		class_3494<class_1792> tag = class_5323.method_29223().method_29220().method_15193(new class_2960(tagId));
 		if (tag == null) return new String[0];
 		Object[] items = tag.method_15138().toArray();
 		String[] res = new String[items.length];

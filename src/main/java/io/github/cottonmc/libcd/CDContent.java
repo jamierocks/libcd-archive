@@ -27,8 +27,7 @@ import net.minecraft.class_1847;
 import net.minecraft.class_2246;
 import net.minecraft.class_2378;
 import net.minecraft.class_2960;
-import net.minecraft.class_3481;
-import net.minecraft.class_3489;
+import net.minecraft.class_5323;
 import java.util.List;
 
 public class CDContent implements LibCDInitializer {
@@ -79,15 +78,15 @@ public class CDContent implements LibCDInitializer {
 			throw new CDSyntaxError("item_exists must accept either a String or an Array!");
 		});
 		manager.registerCondition(new class_2960(CDCommons.MODID, "item_tag_exists"), value -> {
-			if (value instanceof String) return class_3489.method_15106().method_15189().contains(new class_2960((String)value));
+			if (value instanceof String) return class_5323.method_29223().method_29220().method_15189().contains(new class_2960((String)value));
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						class_2960 id = new class_2960((String) obj);
-						if (!class_3489.method_15106().method_15189().contains(id)) return false;
-						if (class_3489.method_15106().method_15193(id).method_15138().isEmpty()) return false;
+						if (!class_5323.method_29223().method_29220().method_15189().contains(id)) return false;
+						if (class_5323.method_29223().method_29220().method_15193(id).method_15138().isEmpty()) return false;
 					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -109,15 +108,15 @@ public class CDContent implements LibCDInitializer {
 			throw new CDSyntaxError("block_exists must accept either a String or an Array!");
 		});
 		manager.registerCondition(new class_2960(CDCommons.MODID, "block_tag_exists"), value -> {
-			if (value instanceof String) return class_3481.method_15073().method_15189().contains(new class_2960((String)value));
+			if (value instanceof String) return class_5323.method_29223().method_29218().method_15189().contains(new class_2960((String)value));
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						class_2960 id = new class_2960((String) obj);
-						if (!class_3481.method_15073().method_15189().contains(id)) return false;
-						if (class_3489.method_15106().method_15193(id).method_15138().isEmpty()) return false;
+						if (!class_5323.method_29223().method_29218().method_15189().contains(id)) return false;
+						if (class_5323.method_29223().method_29218().method_15193(id).method_15138().isEmpty()) return false;
 					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 				}
 				return true;

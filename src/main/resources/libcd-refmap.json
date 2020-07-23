@@ -5,7 +5,7 @@
       "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/AbstractCookingRecipe;": "Lnet/minecraft/class_3957;method_17736(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_1874;"
     },
     "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
-      "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
+      "findResources(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
     },
     "io/github/cottonmc/libcd/mixin/ReferenceLootConditionAccessor": {
       "\u003cinit\u003e": "\u003cinit\u003e"
@@ -46,7 +46,7 @@
         "read(Lnet/minecraft/util/Identifier;Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/AbstractCookingRecipe;": "Lnet/minecraft/class_3957;method_17736(Lnet/minecraft/class_2960;Lcom/google/gson/JsonObject;)Lnet/minecraft/class_1874;"
       },
       "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
-        "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
+        "findResources(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
       },
       "io/github/cottonmc/libcd/mixin/ReferenceLootConditionAccessor": {
         "\u003cinit\u003e": "\u003cinit\u003e"

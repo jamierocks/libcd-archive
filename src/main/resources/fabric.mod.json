@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "libcd",
-  "version": "2.4.1+1.16-pre2",
+  "version": "2.5.0+1.16.1",
 
   "name": "LibCapableData",
   "icon": "assets/libcd/icon.png",
@@ -25,7 +25,7 @@
   "mixins": [
     "mixins.libcd.json"
   ],
-  "accessWidener": "libcd.aw",
+  "accessWidener": "libcd.accesswidener",
   "depends": {
     "fabricloader": ">=0.4.0"
   },

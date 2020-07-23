@@ -35,7 +35,7 @@ public abstract class MixinResourceManagerImpl implements class_3296, ReloadList
 
 	@Shadow @Final private Map<String, class_3294> namespaceManagers;
 
-	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	@Inject(method = "findResources(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable<Collection<class_2960>> cir,
 										Set<class_2960> foundResources, List<class_2960> sortedResources) {
 		List<class_2960> sortedCopy = new ArrayList<>(sortedResources);

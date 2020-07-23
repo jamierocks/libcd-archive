@@ -22,8 +22,8 @@ import net.minecraft.class_2378;
 import net.minecraft.class_2509;
 import net.minecraft.class_2540;
 import net.minecraft.class_2960;
-import net.minecraft.class_3489;
 import net.minecraft.class_3494;
+import net.minecraft.class_5323;
 import java.util.*;
 
 /**
@@ -84,7 +84,7 @@ public class RecipeParser {
 			}
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
+				class_3494<class_1792> itemTag = class_5323.method_29223().method_29220().method_15193(new class_2960(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for input: " + in);
 				for (class_1792 item : itemTag.method_15138()) {
 					stacks.add(new class_1799(item));
@@ -132,7 +132,7 @@ public class RecipeParser {
 			class_1792 item;
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
+				class_3494<class_1792> itemTag = class_5323.method_29223().method_29220().method_15193(new class_2960(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
 				item = TagHelper.ITEM.getDefaultEntry(itemTag);
 			} else if (in.contains("->")) {

@@ -17,7 +17,7 @@ import net.minecraft.class_2378;
 import net.minecraft.class_2487;
 import net.minecraft.class_2522;
 import net.minecraft.class_2960;
-import net.minecraft.class_3489;
+import net.minecraft.class_5323;
 import net.minecraft.class_5341;
 import net.minecraft.loot.condition.*;
 import javax.annotation.Nullable;
@@ -125,7 +125,7 @@ public class Conditions {
 		class_2073.class_2074 builder = class_2073.class_2074.method_8973();
 		if (item.indexOf('#') == 0) {
 			class_2960 id = new class_2960(item.substring(1));
-			builder.method_8975(class_3489.method_15106().method_15193(id));
+			builder.method_8975(class_5323.method_29223().method_29220().method_15193(id));
 		} else {
 			class_2960 id = new class_2960(item);
 			builder.method_8977(class_2378.field_11142.method_10223(id));

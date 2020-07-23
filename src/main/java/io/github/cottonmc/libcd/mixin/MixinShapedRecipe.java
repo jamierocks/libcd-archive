@@ -12,8 +12,8 @@ import net.minecraft.class_1869;
 import net.minecraft.class_2487;
 import net.minecraft.class_2509;
 import net.minecraft.class_2960;
-import net.minecraft.class_3489;
 import net.minecraft.class_3518;
+import net.minecraft.class_5323;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,7 +27,7 @@ public class MixinShapedRecipe {
 		if (json.has("tag")) {
 			String tagName = class_3518.method_15265(json, "tag");
 			class_2960 id = new class_2960(tagName);
-			net.minecraft.class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(id);
+			net.minecraft.class_3494<class_1792> itemTag = class_5323.method_29223().method_29220().method_15193(id);
 			if (itemTag == null) {
 				throw new JsonSyntaxException("Unknown tag " + tagName);
 			}

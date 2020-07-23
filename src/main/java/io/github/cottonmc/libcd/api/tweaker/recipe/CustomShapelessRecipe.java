@@ -32,7 +32,7 @@ public class CustomShapelessRecipe extends class_1867 {
 			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.method_17398(), inv.method_17397(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new WorldInfo(world));
 			if (result instanceof Boolean) return (Boolean) result;
 			else {
-				logger.error("Could not check match for custom shapeless recipe %s, returning standard match: function 'matches' must return boolean but returned %s", method_8114(), result.getClass().getName());
+				logger.error("Could not check match for custom shapeless recipe %s, returning standard match: function 'matches' must return a boolean, but returned %s instead", method_8114(), result.getClass().getName());
 				return true;
 			}
 		} catch (Exception e) {
