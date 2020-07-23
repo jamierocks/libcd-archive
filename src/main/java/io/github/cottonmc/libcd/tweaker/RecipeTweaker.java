@@ -30,6 +30,7 @@ import java.util.concurrent.Executor;
 public class RecipeTweaker implements Tweaker {
 	public static final RecipeTweaker INSTANCE = new RecipeTweaker();
 	private class_1863 recipeManager;
+	private int triedRecipeCount;
 	private int recipeCount;
 	private int removeCount;
 	private Map<class_3956<?>, List<class_1860<?>>> toAdd = new HashMap<>();
@@ -41,6 +42,7 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void prepareReload(class_3300 manager) {
+		triedRecipeCount = -1;
 		recipeCount = 0;
 		removeCount = 0;
 		toAdd.clear();
@@ -108,7 +110,8 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	public class_2960 getRecipeId(class_1799 output) {
 		String resultName = class_2378.field_11142.method_10221(output.method_7909()).method_12832();
-		return new class_2960(LibCD.MODID, "tweaked/"+resultName+"-"+recipeCount);
+		triedRecipeCount++;
+		return new class_2960(LibCD.MODID, "tweaked/"+resultName+"-"+triedRecipeCount);
 	}
 
 	/**

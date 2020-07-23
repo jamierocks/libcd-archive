@@ -187,14 +187,13 @@ public class TweakerUtils {
 	 */
 	public class_1799 addLore(class_1799 stack, String[] lore) {
 		class_2487 display = stack.method_7911("display");
-		if (!display.method_10545("Lore")) display.method_10566("Lore", new class_2499());
-		if (display.method_10573("Lore", 9)) {
-			class_2499 list = display.method_10554("Lore", 8);
-			for (int i = 0; i < lore.length; i++) {
-				String line = lore[i];
-				list.method_10533(i, new class_2519(line));
-			}
+		class_2499 list = display.method_10554("Lore", 8);
+		for (int i = 0; i < lore.length; i++) {
+			String line = lore[i];
+			list.method_10533(i, new class_2519("{\"text\":\"" + line + "\"}"));
 		}
+		display.method_10566("Lore", list);
+		stack.method_7959("display", display);
 		return stack;
 	}
 
