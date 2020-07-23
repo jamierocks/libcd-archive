@@ -112,7 +112,7 @@ public class RecipeTweaker implements Tweaker {
 	}
 
 	/**
-	 * Remove a recipe from the recipe recipeManager.
+	 * Remove a recipe from the recipe manager.
 	 * @param id The id of the recipe to remove.
 	 */
 	public void removeRecipe(String id) {
@@ -128,7 +128,7 @@ public class RecipeTweaker implements Tweaker {
 	}
 
 	/**
-	 * Register a recipe to the recipe recipeManager.
+	 * Register a recipe to the recipe manager.
 	 * @param recipe A constructed recipe.
 	 */
 	public void addRecipe(class_1860<?> recipe) {

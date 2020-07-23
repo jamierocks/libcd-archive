@@ -95,12 +95,19 @@ public class TweakerUtils {
 
 	/**
 	 * Create an item stack from an item id.
-	 * @param id The id of the item to get.
+	 * @param id The id of the item to get, along with any NBT.
 	 * @param amount The amount of the item in the stack.
 	 * @return An item stack of the specified item and amount.
 	 */
 	public class_1799 createItemStack(String id, int amount) {
-		return new class_1799(getItem(id), amount);
+		int index = id.indexOf('{');
+		if (index == -1) {
+			return new class_1799(getItem(id), amount);
+		} else {
+			class_1792 item = getItem(id.substring(0, index));
+			class_1799 stack = new class_1799(item, amount);
+			return addNbtToStack(stack, id.substring(index));
+		}
 	}
 
 	/**

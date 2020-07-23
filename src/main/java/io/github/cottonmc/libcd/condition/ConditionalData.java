@@ -8,7 +8,6 @@ import net.minecraft.class_1802;
 import net.minecraft.class_2378;
 import net.minecraft.class_2960;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,7 @@ public class ConditionalData {
 					if (elem instanceof JsonObject) {
 						JsonObject obj = (JsonObject) elem;
 						for (String key : obj.keySet()) {
-							if (!testCondition(new class_2960(key), obj)) return false;
+							if (testCondition(new class_2960(key), parseElement(obj.get(key)))) return true;
 						}
 					}
 				}
@@ -78,7 +77,7 @@ public class ConditionalData {
 
 	public static boolean shouldLoad(class_2960 resourceId, String meta) {
 		try {
-			JsonObject json = LibCD.jankson.load(meta);
+			JsonObject json = LibCD.newJankson().load(meta);
 			JsonElement elem = json.get("when");
 			if (elem instanceof JsonArray) {
 				JsonArray array = (JsonArray)elem;
@@ -90,7 +89,7 @@ public class ConditionalData {
 					JsonObject obj = (JsonObject)condition;
 					for (String key : obj.keySet()) {
 						class_2960 id = key.equals("or")? new class_2960(LibCD.MODID, "or") : new class_2960(key);
-						if (!testCondition(id, obj)) return false;
+						if (!testCondition(id, parseElement(obj.get(key)))) return false;
 					}
 				}
 			}

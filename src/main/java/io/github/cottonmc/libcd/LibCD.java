@@ -5,8 +5,11 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+
 import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.cottonmc.libcd.condition.ConditionalData;
+import io.github.cottonmc.libcd.impl.HeldItemCommand;
 import io.github.cottonmc.libcd.tweaker.*;
 import io.github.cottonmc.libcd.util.CDConfig;
 import net.fabricmc.api.ModInitializer;
@@ -35,7 +38,10 @@ public class LibCD implements ModInitializer {
 
 	public static final Logger logger = LogManager.getLogger();
 	public static CDConfig config;
-	public static final Jankson jankson = JanksonFactory.createJankson();
+
+	public static Jankson newJankson() {
+		return JanksonFactory.createJankson();
+	}
 
 	@Override
 	public void onInitialize() {
@@ -49,12 +55,30 @@ public class LibCD implements ModInitializer {
 			if (potion == class_1847.field_8984) return class_1799.field_8037;
 			return class_1844.method_8061(new class_1799(class_1802.field_8574), potion);
 		});
-		CommandRegistry.INSTANCE.register(false, dispatcher -> dispatcher.register((
+		CommandRegistry.INSTANCE.register(false, dispatcher -> {
+			dispatcher.register(
 				class_2170.method_9247("cd_subset").requires(source -> source.method_9259(3))
 						.then(class_2170.method_9244("subset", StringArgumentType.string())
 								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
 						.then(class_2170.method_9247("-reset").executes(context -> changeSubset(context, "")))
-		)));
+			);
+			
+			
+			//New nodes
+			LiteralCommandNode<class_2168> libcdNode = class_2170
+					.method_9247("libcd")
+					.build();
+			
+			LiteralCommandNode<class_2168> heldNode = class_2170
+					.method_9247("held")
+					.executes(new HeldItemCommand())
+					.build();
+			
+			//Stitch nodes together
+			libcdNode.addChild(heldNode);
+			dispatcher.getRoot().addChild(libcdNode);
+			
+		});
 	}
 
 	private int changeSubset(CommandContext<class_2168> context, String setTo) {
@@ -75,6 +99,7 @@ public class LibCD implements ModInitializer {
 
 	public CDConfig loadConfig() {
 		try {
+			Jankson jankson = newJankson();
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
 			if (!file.exists()) saveConfig(new CDConfig());
 			JsonObject json = jankson.load(file);
@@ -95,7 +120,7 @@ public class LibCD implements ModInitializer {
 	public void saveConfig(CDConfig config) {
 		try {
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
-			JsonElement json = jankson.toJson(config);
+			JsonElement json = newJankson().toJson(config);
 			String result = json.toJson(true, true);
 			if (!file.exists()) file.createNewFile();
 			FileOutputStream out = new FileOutputStream(file,false);
