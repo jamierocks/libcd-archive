@@ -4,6 +4,7 @@ import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.ImmutableMap;
+import io.github.cottonmc.libcd.api.CustomOutputRecipe;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
@@ -103,7 +104,16 @@ public class RecipeTweaker implements Tweaker {
 			}
 			for (class_2960 id : new HashSet<>(map.keySet())) {
 				class_1860 recipe = map.get(id);
-				if (removeFor.getOrDefault(type, Collections.emptyList()).contains(recipe.method_8110().method_7909())) {
+				boolean shouldRemove = false;
+				if (recipe instanceof CustomOutputRecipe) {
+					Collection<class_1792> items = ((CustomOutputRecipe)recipe).getOutputItems();
+					for (class_1792 item : items) {
+						if (removeFor.getOrDefault(type, Collections.emptyList()).contains(item)) shouldRemove = true;
+					}
+				} else {
+					if (removeFor.getOrDefault(type, Collections.emptyList()).contains(recipe.method_8110().method_7909())) shouldRemove = true;
+				}
+				if (shouldRemove) {
 					map.remove(id);
 					removeCount++;
 					removed.add(new JsonPrimitive(typeId + " - " + id.toString()));
