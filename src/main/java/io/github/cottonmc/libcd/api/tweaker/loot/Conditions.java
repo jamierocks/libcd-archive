@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
+import io.github.cottonmc.libcd.mixin.ReferenceLootConditionAccessor;
 import net.minecraft.class_182;
 import net.minecraft.class_201;
 import net.minecraft.class_2073;
@@ -17,8 +18,7 @@ import net.minecraft.class_2487;
 import net.minecraft.class_2522;
 import net.minecraft.class_2960;
 import net.minecraft.class_3489;
-import net.minecraft.class_4568;
-import net.minecraft.class_4570;
+import net.minecraft.class_5341;
 import net.minecraft.loot.condition.*;
 import javax.annotation.Nullable;
 
@@ -32,9 +32,9 @@ public class Conditions {
 	 * @param json Stringified JSON of the condition to add.
 	 * @return The parsed condition, ready to add to a pool or entry.
 	 */
-	public class_4570 parse(String json) {
+	public class_5341 parse(String json) {
 		try {
-			return Gsons.LOOT_TABLE.fromJson(json, class_4570.class);
+			return Gsons.LOOT_TABLE.fromJson(json, class_5341.class);
 		} catch (JsonSyntaxException e) {
 			LootTweaker.INSTANCE.getLogger().error("Could not parse loot condition, returning null: " + e.getMessage());
 			return null;
@@ -46,11 +46,11 @@ public class Conditions {
 	 * @param conditions The conditions to test.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 or(class_4570... conditions) {
+	public class_5341 or(class_5341... conditions) {
 		JsonObject json = new JsonObject();
 		json.addProperty("condition", "minecraft:alternative");
 		JsonArray children = new JsonArray();
-		for (class_4570 condition : conditions) {
+		for (class_5341 condition : conditions) {
 			if (condition == null) {
 				LootTweaker.INSTANCE.getLogger().error("Loot table `or` condition cannot take null condition, skipping");
 				continue;
@@ -59,7 +59,7 @@ public class Conditions {
 			children.add(Gsons.PARSER.parse(cond));
 		}
 		json.add("terms", children);
-		return Gsons.LOOT_TABLE.fromJson(json, class_4570.class);
+		return Gsons.LOOT_TABLE.fromJson(json, class_5341.class);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class Conditions {
 	 * @param condition The condition to invert.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 not(class_4570 condition) {
+	public class_5341 not(class_5341 condition) {
 		if (condition == null) {
 			LootTweaker.INSTANCE.getLogger().error("Loot table `not` condition cannot take null condition, returning null");
 			return null;
@@ -76,14 +76,14 @@ public class Conditions {
 		JsonObject cond = new JsonObject();
 		cond.addProperty("condition", "minecraft:inverted");
 		cond.add("term", Gsons.PARSER.parse(json));
-		return Gsons.LOOT_TABLE.fromJson(cond, class_4570.class);
+		return Gsons.LOOT_TABLE.fromJson(cond, class_5341.class);
 	}
 
 	/**
 	 * Check whether an entity was killed by a player.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 killedByPlayer() {
+	public class_5341 killedByPlayer() {
 		return class_221.method_939().build();
 	}
 
@@ -92,7 +92,7 @@ public class Conditions {
 	 * @param chance The chance, as a percentage.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 chance(float chance) {
+	public class_5341 chance(float chance) {
 		return class_219.method_932(chance).build();
 	}
 
@@ -102,7 +102,7 @@ public class Conditions {
 	 * @param multiplier The multiplier for each level of looting on a weapon.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 chanceWithLooting(float chance, float multiplier) {
+	public class_5341 chanceWithLooting(float chance, float multiplier) {
 		return class_225.method_953(chance, multiplier).build();
 	}
 
@@ -110,7 +110,7 @@ public class Conditions {
 	 * Check whether a block survives a creeper explosion.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 survivesExplosion() {
+	public class_5341 survivesExplosion() {
 		return class_201.method_871().build();
 	}
 
@@ -121,7 +121,7 @@ public class Conditions {
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
 	//TODO: enchantment
-	public class_4570 matchTool(String item, String nbt) {
+	public class_5341 matchTool(String item, String nbt) {
 		class_2073.class_2074 builder = class_2073.class_2074.method_8973();
 		if (item.indexOf('#') == 0) {
 			class_2960 id = new class_2960(item.substring(1));
@@ -148,7 +148,7 @@ public class Conditions {
 	 * @param chances The float percentage chance that this will drop for each level of the enchantment.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 enchantBonus(String enchantment, float[] chances) {
+	public class_5341 enchantBonus(String enchantment, float[] chances) {
 		return class_182.method_800(class_2378.field_11160.method_10223(new class_2960(enchantment)), chances).build();
 	}
 
@@ -158,12 +158,12 @@ public class Conditions {
 	 * @param thundering The state of thunder required to drop (use null to ignore).
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 weather(@Nullable Boolean raining, @Nullable Boolean thundering) {
+	public class_5341 weather(@Nullable Boolean raining, @Nullable Boolean thundering) {
 		JsonObject json = new JsonObject();
 		json.addProperty("type", "minecraft:weather_check");
 		if (raining != null) json.addProperty("raining", raining);
 		if (thundering != null) json.addProperty("thundering", thundering);
-		return Gsons.LOOT_TABLE.fromJson(json, class_4570.class);
+		return Gsons.LOOT_TABLE.fromJson(json, class_5341.class);
 	}
 
 	/**
@@ -171,8 +171,8 @@ public class Conditions {
 	 * @param id The ID of the predicate JSON to use.
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
-	public class_4570 predicate(String id) {
-		return new class_4568(new class_2960(id));
+	public class_5341 predicate(String id) {
+		return ReferenceLootConditionAccessor.callConstructor(new class_2960(id));
 	}
 
 }

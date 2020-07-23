@@ -31,6 +31,7 @@ import net.minecraft.class_3862;
 import net.minecraft.class_3920;
 import net.minecraft.class_3956;
 import net.minecraft.class_3975;
+import net.minecraft.class_5357;
 import net.minecraft.recipe.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -492,6 +493,24 @@ public class RecipeTweaker implements Tweaker {
 			addRecipe(new class_3975(recipeId, group, ingredient, stack));
 		} catch (Exception e) {
 			logger.error("Error parsing stonecutter recipe - " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Register a recipe to forge in the smithing table.
+	 * @param base The base input item or tag id.
+	 * @param addition The addition input item or tag id.
+	 * @param output The output of the recipe.
+	 */
+	public void addSmithing(Object base, Object addition, Object output) {
+		try {
+			class_1799 stack = RecipeParser.processItemStack(output);
+			class_2960 recipeId = getRecipeId(stack);
+			class_1856 baseIng = RecipeParser.processIngredient(base);
+			class_1856 addIng = RecipeParser.processIngredient(addition);
+			addRecipe(new class_5357(recipeId, baseIng, addIng, stack));
+		} catch (Exception e) {
+			logger.error("Error parsing smithing recipe - " + e.getMessage());
 		}
 	}
 

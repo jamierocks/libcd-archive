@@ -172,6 +172,8 @@ public class WrappedCompoundTag {
 		underlying.method_10544(key, value);
 	}
 
+	// TODO: Remove "New" suffix from UUID methods
+
 	/**
 	 * Reads a {@link UUID} from its NBT representation in this {@code CompoundTag}.
 	 * @param key The key to get from.
@@ -192,7 +194,7 @@ public class WrappedCompoundTag {
 	}
 
 	/**
-	 * Insert a UUID into the tag. Saved as two longs titled "<key>Most" and "<key>Least".
+	 * Insert a UUID into the tag. Saved as an integer array.
 	 * @param key The key to insert at.
 	 * @param value The long to insert.
 	 */

@@ -3,11 +3,11 @@ package io.github.cottonmc.libcd.api.tweaker.recipe;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
-import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import io.github.cottonmc.libcd.api.util.MutableStack;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
@@ -124,18 +124,18 @@ public class RecipeParser {
 				count = Integer.parseInt(in.substring(atIndex + 1));
 				in = in.substring(0, atIndex);
 			}
-			class_1792 item;
 			String nbt = "";
+			if (nbtIndex != -1) {
+				nbt = in.substring(nbtIndex);
+				in = in.substring(0, nbtIndex);
+			}
+			class_1792 item;
 			if (in.indexOf('#') == 0) {
-				if (nbtIndex != -1) {
-					nbt = in.substring(nbtIndex);
-					in = in.substring(0, nbtIndex);
-				}
 				String tag = in.substring(1);
 				class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
 				item = TagHelper.ITEM.getDefaultEntry(itemTag);
-			} else if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
+			} else if (in.contains("->")) {
 				class_1799 stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.method_7960())
 					throw new CDSyntaxError("Failed to get special stack for output: " + in);
@@ -144,10 +144,6 @@ public class RecipeParser {
 				}
 				return stack;
 			} else {
-				if (nbtIndex != -1) {
-					nbt = in.substring(nbtIndex);
-					in = in.substring(0, nbtIndex);
-				}
 				item = TweakerUtils.INSTANCE.getItem(in);
 			}
 
@@ -390,7 +386,7 @@ public class RecipeParser {
 		ret.addProperty("item", class_2378.field_11142.method_10221(stack.method_7909()).toString());
 		ret.addProperty("count", stack.method_7947());
 		if (stack.method_7985()) {
-			JsonObject data = Dynamic.convert(class_2509.field_11560, GsonOps.INSTANCE, stack.method_7969()).getAsJsonObject();
+			JsonObject data = Dynamic.convert(class_2509.field_11560, JsonOps.INSTANCE, stack.method_7969()).getAsJsonObject();
 			ret.add("data", data);
 		}
 		return ret;

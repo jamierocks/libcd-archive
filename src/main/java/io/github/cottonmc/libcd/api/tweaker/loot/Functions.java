@@ -10,8 +10,8 @@ import net.minecraft.class_159;
 import net.minecraft.class_3668;
 import net.minecraft.class_40;
 import net.minecraft.class_44;
-import net.minecraft.class_4570;
 import net.minecraft.class_47;
+import net.minecraft.class_5341;
 import net.minecraft.class_61;
 import net.minecraft.loot.function.*;
 
@@ -76,9 +76,9 @@ public class Functions {
 	 * @param conditions The conditions to meet before applying this function.
 	 * @return An assembled function, ready to add to a table or entry.
 	 */
-	public class_117 fillPlayerHead(String from, class_4570... conditions) {
-		List<class_4570> safeConditions = new ArrayList<>();
-		for (class_4570 condition : conditions) {
+	public class_117 fillPlayerHead(String from, class_5341... conditions) {
+		List<class_5341> safeConditions = new ArrayList<>();
+		for (class_5341 condition : conditions) {
 			if (condition == null) {
 				LootTweaker.INSTANCE.getLogger().error("Loot table `fillPlayerHead` function cannot take null condition, ignoring");
 				continue;
@@ -86,7 +86,7 @@ public class Functions {
 			safeConditions.add(condition);
 		}
 		class_47.class_50 target = class_47.class_50.method_314(from);
-		return new class_3668(safeConditions.toArray(new class_4570[]{}), target);
+		return new class_3668(safeConditions.toArray(new class_5341[]{}), target);
 	}
 
 	//TODO: somehow able to pass conditions?

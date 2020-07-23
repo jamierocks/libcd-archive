@@ -7,6 +7,9 @@
     "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
       "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
     },
+    "io/github/cottonmc/libcd/mixin/ReferenceLootConditionAccessor": {
+      "\u003cinit\u003e": "\u003cinit\u003e"
+    },
     "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
       "fromJson": "Lnet/minecraft/class_170;method_27912(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_170;"
     },
@@ -44,6 +47,9 @@
       },
       "io/github/cottonmc/libcd/mixin/MixinResourceManagerImpl": {
         "findResources": "Lnet/minecraft/class_3304;method_14488(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Collection;"
+      },
+      "io/github/cottonmc/libcd/mixin/ReferenceLootConditionAccessor": {
+        "\u003cinit\u003e": "\u003cinit\u003e"
       },
       "io/github/cottonmc/libcd/mixin/MixinAdvancementRewardsDeserializer": {
         "fromJson": "Lnet/minecraft/class_170;method_27912(Lcom/google/gson/JsonObject;)Lnet/minecraft/class_170;"

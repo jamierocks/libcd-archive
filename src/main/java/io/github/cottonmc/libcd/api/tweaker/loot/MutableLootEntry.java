@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import io.github.cottonmc.libcd.api.util.Gsons;
 import net.minecraft.class_117;
 import net.minecraft.class_3518;
-import net.minecraft.class_4570;
+import net.minecraft.class_5341;
 import net.minecraft.class_79;
 
 public class MutableLootEntry {
@@ -64,8 +64,8 @@ public class MutableLootEntry {
 	 * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
 	 * @return This entry with the conditions added.
 	 */
-	public MutableLootEntry addConditions(class_4570... conditions) {
-		for (class_4570 condition : conditions) {
+	public MutableLootEntry addConditions(class_5341... conditions) {
+		for (class_5341 condition : conditions) {
 			if (condition == null) {
 				LootTweaker.INSTANCE.getLogger().error("Loot entry cannot take null condition, skipping");
 			}

@@ -15,23 +15,25 @@ import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
 import io.github.cottonmc.libcd.api.init.ConditionInitializer;
 import io.github.cottonmc.libcd.api.init.TweakerInitializer;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
-import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
+import io.github.cottonmc.libcd.api.tweaker.recipe.CustomSpecialCraftingRecipe;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
 import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
-import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.class_1865;
+import net.minecraft.class_1866;
 import net.minecraft.class_2168;
 import net.minecraft.class_2170;
 import net.minecraft.class_2378;
 import net.minecraft.class_2588;
 import net.minecraft.class_2960;
 import net.minecraft.class_3264;
+import net.minecraft.class_5338;
+import net.minecraft.server.MinecraftServer;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -39,6 +41,8 @@ public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";
 
 	public static CDConfig config;
+
+	public static class_1865<CustomSpecialCraftingRecipe> CUSTOM_SPECIAL_SERIALIZER;
 
 	public static boolean isDevMode() {
 		return config.dev_mode;
@@ -56,8 +60,8 @@ public class LibCD implements ModInitializer {
 			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
 		ResourceManagerHelper.get(class_3264.field_14190).registerReloadListener(new TweakerLoader());
-		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
-		class_2378.method_10230(class_2378.field_17598, new class_2960(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
+		class_2378.method_10230(class_2378.field_25293, new class_2960(LibCD.MODID, "defaulted_tag"), new class_5338(new DefaultedTagEntrySerializer()));
+		CUSTOM_SPECIAL_SERIALIZER = class_2378.method_10230(class_2378.field_17598, new class_2960(MODID, "custom_special_crafting"), new class_1866<>(CustomSpecialCraftingRecipe::new));
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			
 			//New nodes
@@ -110,7 +114,9 @@ public class LibCD implements ModInitializer {
 		config.tweaker_subset = setTo;
 		saveConfig(config);
 		context.getSource().method_9226(new class_2588("libcd.reload.success"), false);
-		(context.getSource()).method_9211().method_3848();
+		MinecraftServer server = context.getSource().method_9211();
+		// TODO: Use a cleaner approach than executing /reload
+		server.method_3734().method_9249(server.method_3739(), "reload");
 		return 1;
 	}
 

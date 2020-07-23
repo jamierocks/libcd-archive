@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.class_117;
 import net.minecraft.class_3518;
-import net.minecraft.class_4570;
+import net.minecraft.class_5341;
 import net.minecraft.class_55;
 
 /**
@@ -151,7 +151,7 @@ public class MutableLootPool {
      * @return This pool with the entry added.
      */
     //TODO: remove?
-    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_4570[] conditions) {
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_5341[] conditions) {
         return addLeafEntry(type, name, weight, quality, functions, conditions, new JsonObject());
     }
 
@@ -167,7 +167,7 @@ public class MutableLootPool {
      * @return This pool with the entry added.
      */
     //TODO: remove?
-    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_4570[] conditions, String extra) {
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_5341[] conditions, String extra) {
         return addLeafEntry(type, name, weight, quality, functions, conditions, (JsonObject) Gsons.PARSER.parse(extra));
     }
 
@@ -183,7 +183,7 @@ public class MutableLootPool {
      * @return This pool with the entry added.
      */
     //TODO: remove?
-    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_4570[] conditions, JsonObject extra) {
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, class_117[] functions, class_5341[] conditions, JsonObject extra) {
         JsonObject entry = new JsonObject();
         entry.addProperty("type", type);
         entry.addProperty("name", name);
@@ -198,7 +198,7 @@ public class MutableLootPool {
         }
         if (conditions.length != 0) {
             JsonArray cons = new JsonArray();
-            for (class_4570 con : conditions) {
+            for (class_5341 con : conditions) {
                 cons.add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(con)));
             }
             entry.add("conditions", cons);
@@ -215,8 +215,8 @@ public class MutableLootPool {
      * @param conditions Condition to meet, constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      * @return This pool with the conditions added.
      */
-    public MutableLootPool addConditions(class_4570... conditions) {
-        for (class_4570 condition : conditions) {
+    public MutableLootPool addConditions(class_5341... conditions) {
+        for (class_5341 condition : conditions) {
             if (condition == null) {
                 LootTweaker.INSTANCE.getLogger().error("Loot pool cannot take null condition, ignoring");
                 continue;

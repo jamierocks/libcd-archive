@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.api.tweaker.recipe;
 
+import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.util.DummyPlayer;
@@ -7,7 +8,6 @@ import io.github.cottonmc.libcd.api.util.StackInfo;
 import io.github.cottonmc.libcd.api.util.WorldInfo;
 import io.github.cottonmc.libcd.api.util.WrappedPlayer;
 import io.github.cottonmc.libcd.api.util.crafting.CraftingUtils;
-import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
 import net.minecraft.class_1657;
 import net.minecraft.class_1715;
 import net.minecraft.class_1799;
@@ -82,8 +82,9 @@ public class CustomSpecialCraftingRecipe extends class_1852 {
 		return remainingStacks;
 	}
 
+	//TODO: custom serializer to let users specify a script bridge?
 	@Override
 	public class_1865<?> method_8119() {
-		return CustomSpecialRecipeSerializer.INSTANCE;
+		return LibCD.CUSTOM_SPECIAL_SERIALIZER;
 	}
 }

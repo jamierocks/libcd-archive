@@ -7,7 +7,6 @@ import net.minecraft.class_1799;
 import net.minecraft.class_2168;
 import net.minecraft.class_2378;
 import net.minecraft.class_2487;
-import net.minecraft.class_2556;
 import net.minecraft.class_2558;
 import net.minecraft.class_2568;
 import net.minecraft.class_2583;
@@ -41,7 +40,7 @@ public class HeldItemCommand implements Command<class_2168> {
 			.method_10958(new class_2558(class_2558.class_2559.field_21462, description.toString()));
 		
 		feedback.method_10862(clickableStyle);
-		player.method_14254(feedback, class_2556.field_11737);
+		player.method_7353(feedback, false);
 		
 		return 1;
 	}

@@ -12,17 +12,13 @@ import net.minecraft.class_2960;
 import net.minecraft.class_3489;
 import net.minecraft.class_3494;
 import net.minecraft.class_3518;
-import net.minecraft.class_4570;
+import net.minecraft.class_5341;
 import net.minecraft.class_85;
 
 public class DefaultedTagEntrySerializer extends class_85.class_90<DefaultedTagEntry> {
 
-	public DefaultedTagEntrySerializer() {
-		super(new class_2960(LibCD.MODID, "defaulted_tag"), DefaultedTagEntry.class);
-	}
-
 	@Override
-	protected DefaultedTagEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, class_4570[] conditions, class_117[] functions) {
+	protected DefaultedTagEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, class_5341[] conditions, class_117[] functions) {
 		String tagName = class_3518.method_15265(entryJson, "name");
 		class_3494<class_1792> itemTag = class_3489.method_15106().method_15193(new class_2960(tagName));
 		if (itemTag == null) {

@@ -4,6 +4,8 @@ import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
+import io.github.cottonmc.parchment.api.InvocableScript;
+import io.github.cottonmc.parchment.api.Script;
 import javax.annotation.Nullable;
 import javax.script.Invocable;
 import javax.script.ScriptContext;
@@ -17,18 +19,18 @@ import java.util.List;
  * A bridge for specific LibCD hooks between Java and JSR-223 languages. An instance is provided to every script as `libcd`.
  * Contains information for other extension systems, such as the script engine, the text of the script, and the script's ID
  */
-public class ScriptBridge {
+public class ScriptBridge implements Script, InvocableScript {
 	private ScriptEngine engine;
-	private String scriptText;
 	private class_2960 id;
+	private String contents;
 	private boolean hasRun = false;
 	private boolean hasErrored = false;
 	private List<Tweaker> requiredTweakers = new ArrayList<>();
 
-	public ScriptBridge(ScriptEngine engine, String scriptText, class_2960 id) {
+	public ScriptBridge(ScriptEngine engine, class_2960 id, String contents) {
 		this.engine = engine;
-		this.scriptText = scriptText;
 		this.id = id;
+		this.contents = contents;
 	}
 
 	/**
@@ -66,17 +68,24 @@ public class ScriptBridge {
 		return bridge;
 	}
 
+	@Override
 	public ScriptEngine getEngine() {
 		return engine;
 	}
 
-	//TODO: is this helpful?
-	public String getScriptText() {
-		return scriptText;
-	}
-
+	@Override
 	public class_2960 getId() {
 		return id;
+	}
+
+	@Override
+	public String getContents() {
+		return contents;
+	}
+
+	@Deprecated
+	public String getScriptText() {
+		return getContents();
 	}
 
 	/**
@@ -84,6 +93,7 @@ public class ScriptBridge {
 	 * @param varName The name of the variable to get.
 	 * @return The variable with this name, or null in case of an error.
 	 */
+	@Override
 	@Nullable
 	public Object getVar(String varName) {
 		if (!hasRun()) run();
@@ -100,6 +110,7 @@ public class ScriptBridge {
 	 * @param args The arguments to supply to the function.
 	 * @return The result of the function, or null in case of an error.
 	 */
+	@Override
 	@Nullable
 	public Object invokeFunction(String funcName, Object...args) {
 		if (!hasRun()) run();
@@ -125,16 +136,14 @@ public class ScriptBridge {
 	/**
 	 * Run a script! You probably don't need to call this yourself.
 	 */
+	@Override
 	public void run() {
 		if (hasRun()) return;
-		if (!scriptText.contains("libcd.require")) {
-			CDCommons.logger.warn("WARNING! Script %s doesn't use the new `libcd.require` system! It may break in a future update!", id.toString());
-		}
 		ScriptContext ctx = engine.getContext();
 		ctx.setAttribute("libcd", this, ScriptContext.ENGINE_SCOPE);
 		ctx.setAttribute("log", new CDLogger(id.toString()), ScriptContext.ENGINE_SCOPE);
 		try {
-			engine.eval(scriptText);
+			engine.eval(contents);
 		} catch (ScriptException e) {
 			hasErrored = true;
 			CDCommons.logger.error("Error executing tweaker script %s: %s", id.toString(), e.getMessage());
@@ -150,10 +159,16 @@ public class ScriptBridge {
 		return hasRun;
 	}
 
+	@Override
+	public boolean hadError() {
+		return hasErrored;
+	}
+
 	/**
 	 * @return Whether this script errored when running. If true, you won't be able to invoke any functions in it or get any vars from it.
 	 */
+	@Deprecated
 	public boolean hasErrored() {
-		return hasErrored;
+		return hadError();
 	}
 }
