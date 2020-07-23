@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.tweaker;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
@@ -21,14 +22,16 @@ import net.minecraft.class_3920;
 import net.minecraft.class_3956;
 import net.minecraft.class_3975;
 import net.minecraft.recipe.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Executor;
 
 public class RecipeTweaker implements Tweaker {
 	public static final RecipeTweaker INSTANCE = new RecipeTweaker();
 	private class_1863 manager;
 	private int recipeCount;
 	private int removeCount;
+	private Map<class_3956<?>, List<class_1860<?>>> toAdd = new HashMap<>();
+	private List<class_2960> toRemove = new ArrayList<>();
 
 	/**
 	 * Used during data pack loading to set up recipe adding.
@@ -38,6 +41,8 @@ public class RecipeTweaker implements Tweaker {
 	public void prepareReload(class_3300 manager) {
 		recipeCount = 0;
 		removeCount = 0;
+		toAdd.clear();
+		toRemove.clear();
 		if (manager instanceof ReloadListenersAccessor) {
 			List<class_3302> listeners = ((ReloadListenersAccessor)manager).libcd_getListeners();
 			for (class_3302 listener : listeners) {
@@ -51,6 +56,41 @@ public class RecipeTweaker implements Tweaker {
 		}
 		LibCD.logger.error("No reload listeners accessor found! Tweaker cannot register recipes!");
 		throw new IllegalStateException("No reload listeners accessor found! Tweaker cannot register recipes!");
+	}
+
+	/**
+	 * Used during data pack applying to directly apply recipes.
+	 * This is "safe" to call yourself, but will result in a *lot* of log spam.
+	 * NOTE: for some reason, Mojang decided to make the recipe map entirely immutable!
+	 *   I don't like this but I respect it, so this code will preserve the map's immutability,
+	 *   even though it might be a better idea to leave it mutable.
+	 */
+	@Override
+	public void applyReload(class_3300 manager, Executor executor) {
+		Map<class_3956<?>, Map<class_2960, class_1860<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)INSTANCE.manager).libcd_getRecipeMap());
+		Set<class_3956<?>> types = new HashSet<>(recipeMap.keySet());
+		types.addAll(toAdd.keySet());
+		for (class_3956<?> type : types) {
+			Map<class_2960, class_1860<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
+			for (class_1860<?> recipe : toAdd.get(type)) {
+				class_2960 id = recipe.method_8114();
+				if (map.containsKey(id)) {
+					LibCD.logger.error("Failed to add recipe from tweaker - duplicate recipe ID: " + id);
+				} else try {
+					map.put(id, recipe);
+					INSTANCE.recipeCount++;
+				} catch (Exception e) {
+					LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
+				}
+			}
+			for (class_2960 recipeId : toRemove) {
+				if (map.containsKey(recipeId)) {
+					map.remove(recipeId);
+					INSTANCE.removeCount++;
+				} else LibCD.logger.error("Could not find recipe to remove: " + recipeId.toString());
+			}
+			recipeMap.put(type, ImmutableMap.copyOf(map));
+		}
 	}
 
 	@Override
@@ -73,17 +113,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param id The id of the recipe to remove.
 	 */
 	public static void removeRecipe(String id) {
-		class_2960 recipeId = new class_2960(id);
-		Map<class_3956<?>, Map<class_2960, class_1860<?>>> recipeMap = ((RecipeMapAccessor)INSTANCE.manager).libcd_getRecipeMap();
-		for (class_3956<?> type : recipeMap.keySet()) {
-			Map<class_2960, class_1860<?>> map = recipeMap.get(type);
-			if (map.containsKey(recipeId)) {
-				map.remove(recipeId);
-				INSTANCE.removeCount++;
-				return;
-			}
-		}
-		LibCD.logger.error("Could not find recipe to remove: " + id);
+		INSTANCE.toRemove.add(new class_2960(id));
 	}
 
 	/**
@@ -91,12 +121,12 @@ public class RecipeTweaker implements Tweaker {
 	 * @param recipe A constructed recipe.
 	 */
 	public static void addRecipe(class_1860<?> recipe) {
-		INSTANCE.recipeCount++;
-		try {
-			INSTANCE.manager.method_8125(recipe);
-		} catch (Exception e) {
-			LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
+		class_3956<?> type = recipe.method_17716();
+		if (!INSTANCE.toAdd.containsKey(type)) {
+			INSTANCE.toAdd.put(type, new ArrayList<>());
 		}
+		List<class_1860<?>> recipeList = INSTANCE.toAdd.get(type);
+		recipeList.add(recipe);
 	}
 
 	/**

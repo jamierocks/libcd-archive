@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.tweaker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import net.minecraft.class_3300;
 
 public interface Tweaker {
@@ -16,11 +17,19 @@ public interface Tweaker {
 	}
 
 	/**
-	 * Called whenever the /reload command is run, before scripts are applied.
+	 * Called whenever the /reload command is run, before scripts are run.
 	 * Use this time to empty out any lists or maps you need to.
 	 * @param manager The ResourceManager reloading tweakers.
 	 */
 	void prepareReload(class_3300 manager);
+
+	/**
+	 * Called whenever the /reload command is run, after scripts are run.
+	 * Use this time to apply whatever you need to.
+	 * @param manager The ResourceManager applying tweakers. Should be the same one called in prepareReload.
+	 * @param executor The Executor applying tweakers.
+	 */
+	void applyReload(class_3300 manager, Executor executor);
 
 	/**
 	 * Called after all scripts have been run, to log what tweakers have been applied.
